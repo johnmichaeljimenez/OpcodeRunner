@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OpcodeEngine/OpcodeEngine.csproj" />
+  <Project Path="OpcodeTest/OpcodeTest.csproj" />
+</Solution>
