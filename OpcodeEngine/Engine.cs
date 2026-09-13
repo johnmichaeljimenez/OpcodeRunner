@@ -44,6 +44,7 @@ public class Engine
 		if (instruction.Commands.Count == 0)
 			return;
 
+		instruction.IsRunning = true;
 		instruction.IsPaused = false;
 		instruction.SetIndex(0);
 
@@ -81,6 +82,7 @@ public class Engine
 		for (int i = _toRemove.Count - 1; i >= 0; i--)
 		{
 			var ins = _toRemove[i];
+			ins.IsRunning = false;
 			runningCommands.Remove(ins);
 			_toRemove.RemoveAt(i);
 		}

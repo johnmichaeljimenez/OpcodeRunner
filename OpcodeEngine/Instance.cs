@@ -7,7 +7,7 @@ public class Instruction
 
 	public int CurrentIndex { get; set; }
 	public bool IsPaused { get; set; }
-	public bool IsRunning => CurrentIndex < Commands.Count;
+	public bool IsRunning { get; internal set; }
 
 	public readonly List<Command> Commands = new();
 	public readonly Dictionary<string, int> Labels = new();
@@ -68,8 +68,7 @@ public class Wait : Command
 
 	public override void OnInit(params string[] args)
 	{
-		int.TryParse(args[0], out var millis);
-		delay = millis / 1000f;
+		float.TryParse(args[0], out delay);
 	}
 
 	public override void OnEnter()

@@ -12,7 +12,7 @@ public class Program
 
 		PRINT HELLO
 		SAVE TEST TRUE
-		WAIT 2000
+		WAIT 2
 		JUMP TEST BYE
 			PRINT "SKIP ME"
 		>BYE
