@@ -23,7 +23,11 @@ public class Instruction
 
 	public void Jump(string name)
 	{
-		var index = Labels[name];
+		if (!Labels.TryGetValue(name, out var index))
+		{
+			throw new InvalidOperationException($"Label '{name}' not found.");
+		}
+
 		SetIndex(index);
 	}
 }

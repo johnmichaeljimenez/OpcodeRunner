@@ -104,12 +104,19 @@ public class Engine
 
 			if (line.StartsWith(">"))
 			{
-				ins.Labels.Add(line.Substring(1).Trim(), n);
+				var labelName = line.Substring(1).Trim();
+				if (ins.Labels.ContainsKey(labelName))
+					throw new InvalidOperationException($"Label '{labelName}' already exists");
+
+				ins.Labels.Add(labelName, n);
 				continue;
 			}
 
 			var parts = line.SplitArguments();
-			var type = commandTypes[parts[0].ToUpper()];
+			var typeName = parts[0].ToUpper();
+
+			if (!commandTypes.TryGetValue(typeName, out var type))
+				throw new Exception($"Unknown command: '{typeName}'");
 
 			var command = Activator.CreateInstance(type) as Command;
 			command.Initialize(this, ins);
