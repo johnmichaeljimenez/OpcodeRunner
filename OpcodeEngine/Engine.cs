@@ -18,10 +18,19 @@ public class Engine
 
 	public void FireTrigger(string triggerName)
 	{
+		var isWildcard = triggerName.Contains("*");
 		foreach (var i in allCommands)
 		{
-			if (i.TriggerKey != triggerName.ToUpper())
-				continue;
+			if (isWildcard)
+			{
+				if (!Utils.IsMatchWildcard(i.TriggerKey, triggerName))
+					continue;
+			}
+			else
+			{
+				if (i.TriggerKey != triggerName.ToUpper())
+					continue;
+			}
 
 			Run(i);
 		}
@@ -29,6 +38,9 @@ public class Engine
 
 	public void Run(Instruction instruction)
 	{
+		if (instruction.Commands.Count == 0)
+			return;
+
 		instruction.IsPaused = false;
 		instruction.SetIndex(0);
 
@@ -38,12 +50,12 @@ public class Engine
 
 	public void Tick(float deltaTime)
 	{
-		if (deltaTime <= 0)
+		if (deltaTime <= 0 || runningCommands.Count == 0)
 			return;
 
-		foreach (var i in runningCommands)
+		foreach (var i in runningCommands.ToArray())
 		{
-			if (i.IsPaused)
+			if (i.IsPaused || i.CurrentIndex >= i.Commands.Count)
 				continue;
 
 			var line = i.Commands[i.CurrentIndex];

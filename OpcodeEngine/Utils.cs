@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpcodeEngine;
 
@@ -64,5 +65,16 @@ public static class Utils
         }
 
         return result;
+    }
+
+    public static bool IsMatchWildcard(string input, string wildcardPattern)
+    {
+        string regexPattern = Regex.Escape(wildcardPattern)
+                                   .Replace("\\*", ".*")
+                                   .Replace("\\?", ".");
+
+        regexPattern = "^" + regexPattern + "$";
+
+        return Regex.IsMatch(input, regexPattern, RegexOptions.IgnoreCase);
     }
 }
