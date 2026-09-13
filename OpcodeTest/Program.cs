@@ -8,7 +8,8 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var commandString = """
-		
+		@NEW_GAME_START
+
 		PRINT HELLO
 		SAVE TEST TRUE
 		WAIT 2000
@@ -20,8 +21,8 @@ public class Program
 		""";
 
 		var engine = new Engine();
-		var command = engine.Create("Test", commandString);
-		engine.Run(command);
+		var command = engine.Compile("Test", commandString);
+		engine.FireTrigger("NEW_GAME_START");
 
 		var stopwatch = Stopwatch.StartNew();
 		var lastTime = 0L;

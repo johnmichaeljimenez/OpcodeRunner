@@ -7,6 +7,7 @@ public class Engine
 	public readonly Dictionary<string, bool> SaveKeys = new();
 	private Dictionary<string, Type> commandTypes;
 
+	private readonly List<Instruction> allCommands = new();
 	private readonly List<Instruction> runningCommands = new();
 	private readonly List<Instruction> _toRemove = new();
 
@@ -15,12 +16,24 @@ public class Engine
 		InitRegistry();
 	}
 
+	public void FireTrigger(string triggerName)
+	{
+		foreach (var i in allCommands)
+		{
+			if (i.TriggerKey != triggerName.ToUpper())
+				continue;
+
+			Run(i);
+		}
+	}
+
 	public void Run(Instruction instruction)
 	{
 		instruction.IsPaused = false;
 		instruction.SetIndex(0);
 
-		runningCommands.Add(instruction);
+		if (!runningCommands.Contains(instruction))
+			runningCommands.Add(instruction);
 	}
 
 	public void Tick(float deltaTime)
@@ -82,7 +95,7 @@ public class Engine
 		}
 	}
 
-	public Instruction Create(string id, string code)
+	public Instruction Compile(string id, string code)
 	{
 		if (string.IsNullOrEmpty(code))
 			return null;
@@ -93,6 +106,7 @@ public class Engine
 		};
 
 		var n = 0;
+		var eventCheck = true;
 		foreach (var i in code.Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None))
 		{
 			if (string.IsNullOrEmpty(i))
@@ -101,6 +115,18 @@ public class Engine
 			var line = i.Trim();
 			if (line.StartsWith("#"))
 				continue;
+
+			if (eventCheck)    //event conditions must be at the top before command lines are defined
+			{
+				if (line.StartsWith("@"))
+				{
+					ins.TriggerKey = line.Substring(1).Trim().ToUpper();
+					eventCheck = false;
+					continue;
+				}
+			}
+
+			eventCheck = false;
 
 			if (line.StartsWith(">"))
 			{
@@ -126,6 +152,7 @@ public class Engine
 			n++;
 		}
 
+		allCommands.Add(ins);
 		return ins;
 	}
 }

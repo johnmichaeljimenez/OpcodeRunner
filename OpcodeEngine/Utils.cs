@@ -38,7 +38,7 @@ public static class Utils
         {
             char c = input[i];
 
-            if (c == '"')
+            if (c == '"')   //YAGNI: no double quotes needed yet
             {
                 inQuotes = !inQuotes;
                 continue;

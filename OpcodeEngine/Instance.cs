@@ -3,6 +3,7 @@ namespace OpcodeEngine;
 public class Instruction
 {
 	public string ID { get; set; }
+	public string TriggerKey { get; set; }
 
 	public int CurrentIndex { get; set; }
 	public bool IsPaused { get; set; }
