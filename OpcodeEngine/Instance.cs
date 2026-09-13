@@ -1,16 +1,5 @@
 namespace OpcodeEngine;
 
-[AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-public sealed class CommandAttribute : Attribute
-{
-	public readonly string Name;
-
-	public CommandAttribute(string name = null)
-	{
-		Name = name;
-	}
-}
-
 public class Instruction
 {
 	public string ID { get; set; }
@@ -67,7 +56,6 @@ public abstract class Command
 	public virtual bool OnTick(float deltaTime) => true;
 }
 
-[Command]
 public class Wait : Command
 {
 	private float delay = 0;
@@ -94,7 +82,6 @@ public class Wait : Command
 	}
 }
 
-[Command]
 public class Print : Command
 {
 	private string msg = "";
@@ -110,7 +97,6 @@ public class Print : Command
 	}
 }
 
-[Command]
 public class Save : Command
 {
 	private string key = "";
@@ -128,7 +114,6 @@ public class Save : Command
 	}
 }
 
-[Command]
 public class Jump : Command
 {
 	private string key = "";

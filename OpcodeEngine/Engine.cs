@@ -62,16 +62,10 @@ public class Engine
 	{
 		commandTypes = AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(GetLoadableTypes)
-			.Where(t => t.IsClass && !t.IsAbstract)
-			.Select(t => new
-			{
-				Type = t,
-				Attr = t.GetCustomAttribute<CommandAttribute>()
-			})
-			.Where(x => x.Attr != null)
+			.Where(t => t.IsClass && !t.IsAbstract && typeof(Command).IsAssignableFrom(t) && t != typeof(Command))
 			.ToDictionary(
-				x => string.IsNullOrEmpty(x.Attr.Name) ? x.Type.Name.ToUpper() : x.Attr.Name.ToUpper(),
-				x => x.Type,
+				t => t.Name.ToUpper(),
+				t => t,
 				StringComparer.OrdinalIgnoreCase
 			);
 	}
