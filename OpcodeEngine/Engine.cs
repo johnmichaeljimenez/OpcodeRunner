@@ -38,6 +38,9 @@ public class Engine
 
 	public void Run(Instruction instruction)
 	{
+		if (instruction.IsRunning)
+			return;
+
 		if (instruction.Commands.Count == 0)
 			return;
 
@@ -85,14 +88,13 @@ public class Engine
 
 	private void InitRegistry()
 	{
-		commandTypes = AppDomain.CurrentDomain.GetAssemblies()
+		commandTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+		foreach (var t in AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(GetLoadableTypes)
-			.Where(t => t.IsClass && !t.IsAbstract && typeof(Command).IsAssignableFrom(t) && t != typeof(Command))
-			.ToDictionary(
-				t => t.Name.ToUpper(),
-				t => t,
-				StringComparer.OrdinalIgnoreCase
-			);
+			.Where(t => t.IsClass && !t.IsAbstract && typeof(Command).IsAssignableFrom(t) && t != typeof(Command)))
+		{
+			commandTypes.TryAdd(t.Name.ToUpper(), t);
+		}
 	}
 
 	private IEnumerable<Type> GetLoadableTypes(Assembly assembly)
@@ -125,6 +127,9 @@ public class Engine
 				continue;
 
 			var line = i.Trim();
+			if (line.Length == 0)
+				continue;
+
 			if (line.StartsWith("#"))
 				continue;
 
@@ -166,5 +171,11 @@ public class Engine
 
 		allCommands.Add(ins);
 		return ins;
+	}
+
+	public void Unload(Instruction instruction)
+	{
+		allCommands.Remove(instruction);
+		runningCommands.Remove(instruction);
 	}
 }
