@@ -64,10 +64,13 @@ public class Engine
 
 			var line = i.Commands[i.CurrentIndex];
 			var currentIndex = i.CurrentIndex;
-			if (!line.OnTick(deltaTime))
+			var updateDone = line.OnTick(deltaTime);
+			
+			if (!updateDone)
 				continue;
 
 			line.OnExit();
+			OnPostExecuteCommand(line);
 
 			if (currentIndex != i.CurrentIndex) //someone modified index internally, ex. jump
 				continue;
@@ -179,5 +182,10 @@ public class Engine
 	{
 		allCommands.Remove(instruction);
 		runningCommands.Remove(instruction);
+	}
+
+	protected virtual void OnPostExecuteCommand(Command command)
+	{
+
 	}
 }
