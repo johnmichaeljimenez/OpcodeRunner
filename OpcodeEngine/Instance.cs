@@ -131,9 +131,11 @@ public class Jump : Command
 
 	public override void OnEnter()
 	{
-		if (!Engine.SaveKeys.ContainsKey(key) || !Engine.SaveKeys[key])
+		if (!Condition)
 			return;
 
 		Instruction.Jump(labelName);
 	}
+
+	protected virtual bool Condition => Engine.SaveKeys.ContainsKey(key) && Engine.SaveKeys[key];
 }
