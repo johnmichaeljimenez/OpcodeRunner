@@ -121,7 +121,7 @@ public class Save : Command
 public class Jump : Command
 {
 	private string key = "";
-	private string labelName;
+	protected string labelName;
 
 	public override void OnInit(params string[] args)
 	{
