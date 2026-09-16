@@ -18,21 +18,30 @@ public class Engine
 
 	public void FireTrigger(string triggerName)
 	{
-		var isWildcard = triggerName.Contains("*");
 		foreach (var i in allCommands)
 		{
-			if (isWildcard)
+			if (string.IsNullOrEmpty(i.TriggerKey))
+				continue;
+
+			var isMatch = false;
+
+			if (triggerName.Contains("*"))
 			{
-				if (!Utils.IsMatchWildcard(i.TriggerKey, triggerName))
-					continue;
+				isMatch = Utils.IsMatchWildcard(i.TriggerKey, triggerName);
+			}
+			else if (i.TriggerKey.Contains("*"))
+			{
+				isMatch = Utils.IsMatchWildcard(triggerName, i.TriggerKey);
 			}
 			else
 			{
-				if (i.TriggerKey != triggerName.ToUpper())
-					continue;
+				isMatch = string.Equals(i.TriggerKey, triggerName, StringComparison.OrdinalIgnoreCase);
 			}
 
-			Run(i);
+			if (isMatch)
+			{
+				Run(i);
+			}
 		}
 	}
 
@@ -65,7 +74,7 @@ public class Engine
 			var line = i.Commands[i.CurrentIndex];
 			var currentIndex = i.CurrentIndex;
 			var updateDone = line.OnTick(deltaTime);
-			
+
 			if (!updateDone)
 				continue;
 
