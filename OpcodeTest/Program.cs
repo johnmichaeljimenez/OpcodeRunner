@@ -15,9 +15,10 @@ public class Program
 		SAVE TEST TRUE
 		WAIT 2
 		JUMP TEST BYE
-			PRINT "SKIP ME"
+			PRINT "CONDITION NOT MET"
+		BREAK
 		>BYE
-			PRINT "GOOD BYE"
+			PRINT "CONDITION MET"
 		
 		""";
 
