@@ -9,16 +9,16 @@ namespace OpcodeEngine.Commands
 
 		public override void OnInit(params string[] args)
 		{
-			key = args[0];
-			ParseLabel(args);
+			ParseKey(args[0]);
+			labelName = args[1];
 		}
 
-		protected void ParseLabel(params string[] args)
+		protected void ParseKey(string argsKey)
 		{
-			labelName = args[1];
-			if (labelName.StartsWith("!"))
+			key = argsKey;
+			if (key.StartsWith("!"))
 			{
-				labelName = labelName.Substring(1);
+				key = key.Substring(1);
 				inverted = true;
 			}
 		}
