@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using OpcodeEngine.Commands;
 
-namespace OpcodeEngine;
+namespace OpcodeEngine.Core;
 
 public class Engine
 {

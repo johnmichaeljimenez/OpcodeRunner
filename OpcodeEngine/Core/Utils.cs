@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace OpcodeEngine;
+namespace OpcodeEngine.Core;
 
 public static class Utils
 {

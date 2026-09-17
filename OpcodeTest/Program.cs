@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using OpcodeEngine;
+using OpcodeEngine.Core;
 
 namespace OpcodeTest;
 
