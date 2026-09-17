@@ -11,15 +11,19 @@ public class Program
 		var commandString = """
 		@NEW_GAME_START
 
-		PRINT HELLO
+		PRINT "HELLO"
 		SAVE TEST TRUE
-		WAIT 2
-		JUMP TEST BYE
+		WAIT 0.2
+		JUMP TEST OK
 			PRINT "CONDITION NOT MET"
-		BREAK
-		>BYE
+		JUMP END
+		>OK
 			PRINT "CONDITION MET"
 		
+
+		>END
+			PRINT "END"
+			BREAK
 		""";
 
 		var engine = new Engine();
