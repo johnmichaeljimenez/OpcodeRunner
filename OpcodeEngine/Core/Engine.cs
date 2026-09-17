@@ -82,6 +82,12 @@ public class Engine
 			line.OnExit();
 			OnPostExecuteCommand(line);
 
+			if (!i.IsRunning)
+			{
+				_toRemove.Add(i);
+				continue;
+			}
+
 			if (currentIndex != i.CurrentIndex) //someone modified index internally, ex. jump
 				continue;
 
