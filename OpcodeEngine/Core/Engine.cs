@@ -130,6 +130,12 @@ public class Engine
 		}
 	}
 
+	public Instruction CompileFile(string path, string id = null) //null id == file path
+	{
+		var content = File.ReadAllText(path);
+		return Compile(string.IsNullOrEmpty(id)? Path.GetFileNameWithoutExtension(path) : id, content);
+	}
+
 	public Instruction Compile(string id, string code)
 	{
 		if (string.IsNullOrEmpty(code))
