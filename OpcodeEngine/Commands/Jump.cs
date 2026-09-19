@@ -20,6 +20,7 @@ namespace OpcodeEngine.Commands
 			if (!hasKey)
 				return;
 
+			key = key.ToUpper();
 			if (key.StartsWith("!"))
 			{
 				key = key.Substring(1);

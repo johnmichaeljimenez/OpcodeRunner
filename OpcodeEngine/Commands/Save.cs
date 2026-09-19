@@ -12,7 +12,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			Engine.SaveKeys[key] = value;
+			Engine.SaveKeys[key.ToUpper()] = value;
 		}
 	}
 }
