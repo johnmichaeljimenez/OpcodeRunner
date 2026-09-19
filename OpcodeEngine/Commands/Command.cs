@@ -16,7 +16,7 @@ namespace OpcodeEngine.Commands
 			for (int i = 0; i < commandType.Parameters.Count; i++)
 			{
 				var param = commandType.Parameters[i];
-				object value = i < args.Length
+				object value = i < args.Length && !args[i].Equals("<null>", StringComparison.InvariantCultureIgnoreCase)
 					? ConvertArgument(args[i], param.Type, param.Field.Name)
 					: param.DefaultValue;
 
