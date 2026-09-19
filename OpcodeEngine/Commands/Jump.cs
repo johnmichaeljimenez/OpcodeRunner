@@ -1,31 +1,25 @@
+using OpcodeEngine.Core;
+
 namespace OpcodeEngine.Commands
 {
 
 	public class Jump : Command
 	{
+		[CommandParameter]
+		protected string labelName = "";
+		
+		[CommandParameter]
 		private string key = "";
-		private bool hasCondition;
-		protected string labelName;
+
+		private bool hasKey;
 		protected bool inverted;
 
-		public override void OnInit(params string[] args)
+		public override void OnInit()
 		{
-			hasCondition = args.Length > 1;
-			if (!hasCondition)  //label only, so no condition
-			{
-				labelName = args[0];
-				hasCondition = false;
+			hasKey = !string.IsNullOrEmpty(key);
+			if (!hasKey)
 				return;
-			}
 
-
-			ParseKey(args[0]);
-			labelName = args[1];
-		}
-
-		protected void ParseKey(string argsKey)
-		{
-			key = argsKey;
 			if (key.StartsWith("!"))
 			{
 				key = key.Substring(1);
@@ -35,7 +29,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			bool shouldJump = !hasCondition || (inverted ? !Condition : Condition);
+			bool shouldJump = !hasKey || (inverted ? !Condition : Condition);
 
 			if (!shouldJump)
 				return;

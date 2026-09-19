@@ -1,13 +1,11 @@
+using OpcodeEngine.Core;
+
 namespace OpcodeEngine.Commands
 {
 	public class Print : Command
 	{
-		private string msg = "";
-
-		public override void OnInit(params string[] args)
-		{
-			msg = args[0];
-		}
+		[CommandParameter]
+		private string msg = "<empty>";
 
 		public override void OnEnter()
 		{

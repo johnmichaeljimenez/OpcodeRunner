@@ -3,10 +3,27 @@ using OpcodeEngine.Commands;
 
 namespace OpcodeEngine.Core;
 
+public class CommandType
+{
+	public string Name;
+	public Type Type;
+	public List<CommandParameter> Parameters;
+}
+
+public class CommandParameter
+{
+	public FieldInfo Field;
+	public Type Type;
+	public object DefaultValue;
+}
+
+[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+public sealed class CommandParameterAttribute : Attribute { }
+
 public class Engine
 {
 	public readonly Dictionary<string, bool> SaveKeys = new();
-	private Dictionary<string, Type> commandTypes;
+	private Dictionary<string, CommandType> commandTypes;
 
 	private readonly List<Instruction> allCommands = new();
 	private readonly List<Instruction> runningCommands = new();
@@ -109,12 +126,51 @@ public class Engine
 
 	private void InitRegistry()
 	{
-		commandTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+		var validTypes = new List<Type>();
 		foreach (var t in AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(GetLoadableTypes)
 			.Where(t => t.IsClass && !t.IsAbstract && typeof(Command).IsAssignableFrom(t) && t != typeof(Command)))
 		{
-			commandTypes.TryAdd(t.Name.ToUpper(), t);
+			validTypes.Add(t);
+		}
+
+		commandTypes = new();
+		foreach (var i in validTypes)
+		{
+			var instance = Activator.CreateInstance(i) as Command;
+			if (instance == null)
+				continue;
+
+			var parameters = new List<CommandParameter>();
+			var typeChain = new List<Type>();
+			for (var t = i; t != null && t != typeof(object); t = t.BaseType)
+				typeChain.Add(t);
+			typeChain.Reverse();
+
+			foreach (var declaringType in typeChain)
+			{
+				var fields = declaringType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+				foreach (var field in fields)
+				{
+					if (field.GetCustomAttribute<CommandParameterAttribute>() == null)
+						continue;
+
+					parameters.Add(new CommandParameter
+					{
+						Field = field,
+						Type = field.FieldType,
+						DefaultValue = field.GetValue(instance)
+					});
+				}
+			}
+
+			var name = i.Name.ToUpper();
+			commandTypes[name] = new CommandType
+			{
+				Name = name,
+				Type = i,
+				Parameters = parameters
+			};
 		}
 	}
 
@@ -133,7 +189,7 @@ public class Engine
 	public Instruction CompileFile(string path, string id = null) //null id == file path
 	{
 		var content = File.ReadAllText(path);
-		return Compile(string.IsNullOrEmpty(id)? Path.GetFileNameWithoutExtension(path) : id, content);
+		return Compile(string.IsNullOrEmpty(id) ? Path.GetFileNameWithoutExtension(path) : id, content);
 	}
 
 	public Instruction Compile(string id, string code)
@@ -188,9 +244,9 @@ public class Engine
 			if (!commandTypes.TryGetValue(typeName, out var type))
 				throw new Exception($"Unknown command: '{typeName}'");
 
-			var command = Activator.CreateInstance(type) as Command;
-			command.Initialize(this, ins);
-			command.OnInit(parts.Skip(1).ToArray());
+			var command = Activator.CreateInstance(type.Type) as Command;
+			command.Initialize(this, ins, type, parts.Skip(1).ToArray());
+			command.OnInit();
 
 			ins.Commands.Add(command);
 			n++;

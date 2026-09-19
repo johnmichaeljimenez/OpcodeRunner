@@ -1,14 +1,13 @@
+using OpcodeEngine.Core;
+
 namespace OpcodeEngine.Commands
 {
 	public class Wait : Command
 	{
-		private float delay = 0;
+		
+		[CommandParameter]
+		private float delay = 0.1f;
 		private float t = 0;
-
-		public override void OnInit(params string[] args)
-		{
-			float.TryParse(args[0], out delay);
-		}
 
 		public override void OnEnter()
 		{

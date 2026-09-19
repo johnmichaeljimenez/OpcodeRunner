@@ -4,14 +4,11 @@ namespace OpcodeEngine.Commands
 {
 	public class Save : Command
 	{
+		[CommandParameter]
 		private string key = "";
+		
+		[CommandParameter]
 		private bool value;
-
-		public override void OnInit(params string[] args)
-		{
-			key = args[0];
-			Utils.TryParseBool(args[1], out value);
-		}
 
 		public override void OnEnter()
 		{
