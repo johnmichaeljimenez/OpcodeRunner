@@ -29,8 +29,28 @@ public class Engine
 	private readonly List<Instruction> runningCommands = new();
 	private readonly List<Instruction> _toRemove = new();
 
+	public Random RNG { get; private set; }
+	private int _randomSeed;
+	public int RandomSeed
+	{
+		get
+		{
+			return _randomSeed;
+		}
+
+		set
+		{
+			if (_randomSeed == value)
+				return;
+
+			_randomSeed = value;
+			RNG = new Random(_randomSeed);
+		}
+	}
+
 	public Engine()
 	{
+		RandomSeed = DateTime.Now.Millisecond;
 		InitRegistry();
 	}
 
