@@ -20,6 +20,11 @@ public class Program
 		>OK
 			PRINT "CONDITION MET"
 		
+		RNG 0.4 RNG_OK
+		BREAK
+
+		>RNG_OK
+			PRINT "RNG OK!"
 
 		>END
 			PRINT "END"

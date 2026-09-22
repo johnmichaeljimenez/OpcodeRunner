@@ -11,8 +11,8 @@ public class RNG : Command
 
 	public override void OnEnter()
 	{
-		var value = Engine.RNG.Next();
-		if (value<= range)
+		var value = Engine.RNG.NextSingle();
+		if (value <= range)
 			Instruction.Jump(labelName);
 	}
 }
@@ -28,7 +28,7 @@ public class RNGRange : Command
 
 	public override void OnEnter()
 	{
-		var value = Engine.RNG.Next();
+		var value = Engine.RNG.NextSingle();
 		if (value >= min && value <= max)
 			Instruction.Jump(labelName);
 	}
