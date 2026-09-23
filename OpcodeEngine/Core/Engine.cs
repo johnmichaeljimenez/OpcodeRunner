@@ -48,6 +48,8 @@ public class Engine
 		}
 	}
 
+	public bool IsRunning => runningCommands.Count > 0;
+
 	public Engine()
 	{
 		RandomSeed = DateTime.Now.Millisecond;
@@ -83,6 +85,11 @@ public class Engine
 		}
 	}
 
+	public void Run(string id)
+	{
+		Run(allCommands.FirstOrDefault(p => string.Equals(id, p.ID, StringComparison.InvariantCultureIgnoreCase)));
+	}
+
 	public void Run(Instruction instruction)
 	{
 		if (instruction.IsRunning)
@@ -97,6 +104,19 @@ public class Engine
 
 		if (!runningCommands.Contains(instruction))
 			runningCommands.Add(instruction);
+	}
+
+	public void Stop(string id)
+	{
+		Stop(allCommands.FirstOrDefault(i => string.Equals(i.ID, id, StringComparison.OrdinalIgnoreCase)));
+	}
+
+	public void Stop(Instruction instruction)
+	{
+		if (instruction != null)
+		{
+			instruction.IsRunning = false;	//deferred
+		}
 	}
 
 	public void Tick(float deltaTime)

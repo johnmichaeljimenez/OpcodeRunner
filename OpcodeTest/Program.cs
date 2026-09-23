@@ -20,6 +20,7 @@ public class Program
 		>OK
 			PRINT "CONDITION MET"
 		
+		START TEST2
 		RNG 0.4 RNG_OK
 		BREAK
 
@@ -31,15 +32,25 @@ public class Program
 			BREAK
 		""";
 
+		var subCommandString = """
+		PRINT "HELLO 2!"
+		WAIT 0.5
+		PRINT "FIRST COMMAND SHOULD BE DONE BY NOW"
+		WAIT 5
+		PRINT "HELLO 2 END!"
+		""";
+
 		var engine = new Engine();
-		var command = engine.Compile("Test", commandString);
+		engine.Compile("Test", commandString);
+		engine.Compile("Test2", subCommandString);
+		
 		engine.FireTrigger("NEW_GAME_START");
 
 		var stopwatch = Stopwatch.StartNew();
 		var lastTime = 0L;
 		var totalElapsed = 0f;
 
-		while (command.IsRunning)
+		while (engine.IsRunning)
 		{
 			var currentTime = stopwatch.ElapsedMilliseconds;
 			var delta = (currentTime - lastTime) / 1000f;
