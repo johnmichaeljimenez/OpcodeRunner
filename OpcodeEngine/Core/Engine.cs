@@ -21,7 +21,7 @@ public class CommandParameter
 [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public sealed class CommandParameterAttribute : Attribute { }
 
-public class Engine
+public class Engine : IDisposable
 {
 	public long CurrentTick { get; private set; }
 	public readonly List<Var> Vars = new();
@@ -59,6 +59,21 @@ public class Engine
 		RandomSeed = randomSeed;
 		ImmediateMode = immediateMode;
 		InitRegistry();
+	}
+
+	public void Initialize()
+	{
+		OnInitialize();
+		FireTrigger("_INIT");
+		Tick(0);
+	}
+
+	public void Dispose()
+	{
+		OnDispose();
+		_toRemove.Clear();
+		runningCommands.Clear();
+		allCommands.Clear();
 	}
 
 	public void FireTrigger(string triggerName)
@@ -112,7 +127,7 @@ public class Engine
 	public void Tick(float deltaTime)
 	{
 		CurrentTick++;
-		if (deltaTime <= 0 || runningCommands.Count == 0)
+		if (runningCommands.Count == 0)
 			return;
 
 		foreach (var i in runningCommands.ToArray())
@@ -330,6 +345,16 @@ public class Engine
 	{
 		allCommands.Remove(instruction);
 		runningCommands.Remove(instruction);
+	}
+
+	protected virtual void OnInitialize()
+	{
+
+	}
+
+	protected virtual void OnDispose()
+	{
+		
 	}
 
 	protected virtual void OnPostExecuteCommand(Command command)

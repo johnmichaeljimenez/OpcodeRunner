@@ -9,17 +9,16 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var commandString = """
-		@INIT
+		@_INIT
 		DECVAR CTR 10 int
+		PRINT "INITIALIZED PROGRAM"
 
-		PRINT "HAHA"
-		PRINT "LET'S GO"
-
-		PRINT "BEGIN COUNTDOWN!"
+		PRINT "BEGIN COUNTDOWN"
+		WAIT 1
 		>LOOP
-			JUMPEQ CTR 1 END
-			SUB CTR 1
+			JUMPEQ CTR 0 END
 			PRINT "[[CTR]]"
+			SUB CTR 1
 			WAIT 1
 			JUMP LOOP
 
@@ -30,8 +29,7 @@ public class Program
 
 		var engine = new Engine(immediateMode: true);
 		engine.Compile("Test", commandString);
-
-		engine.FireTrigger("INIT");
+		engine.Initialize();
 
 		var stopwatch = Stopwatch.StartNew();
 		var lastTime = 0L;
