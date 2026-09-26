@@ -6,6 +6,8 @@ public static class Utils
 {
 	internal static Engine Test(string scriptFileName, out string output)
 	{
+		scriptFileName = scriptFileName.Replace("\\", "/"); //for linux
+
 		var engineOutput = "";
 		var engine = new Engine(immediateMode: true);
 		engine.CompileFile($"scripts/{scriptFileName}");
