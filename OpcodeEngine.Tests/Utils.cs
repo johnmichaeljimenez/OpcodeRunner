@@ -8,7 +8,7 @@ public static class Utils
 	{
 		var engineOutput = "";
 		var engine = new Engine(immediateMode: true);
-		engine.CompileFile($"Scripts/{scriptFileName}");
+		engine.CompileFile($"scripts/{scriptFileName}");
 		engine.OnOutput += (str) => { engineOutput += $"{str}"; };
 		engine.Initialize();
 

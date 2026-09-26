@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OpcodeEngine\OpcodeEngine.csproj" />
-    <None Include="scripts\**" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="scripts/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
