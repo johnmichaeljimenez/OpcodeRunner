@@ -1,0 +1,12 @@
+@_INIT
+
+DECVAR MSG "Hello, your gold is: " string
+DECVAR GOLD 0 int
+
+>LOOP
+	JUMPEQ GOLD 10 END
+	ADD GOLD 1
+	JUMP LOOP
+
+>END
+	PRINT "[[MSG]][[GOLD]]"
