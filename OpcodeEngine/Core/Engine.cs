@@ -63,22 +63,7 @@ public class Engine
 			if (string.IsNullOrEmpty(i.TriggerKey))
 				continue;
 
-			var isMatch = false;
-
-			if (triggerName.Contains("*"))
-			{
-				isMatch = Utils.IsMatchWildcard(i.TriggerKey, triggerName);
-			}
-			else if (i.TriggerKey.Contains("*"))
-			{
-				isMatch = Utils.IsMatchWildcard(triggerName, i.TriggerKey);
-			}
-			else
-			{
-				isMatch = string.Equals(i.TriggerKey, triggerName, StringComparison.OrdinalIgnoreCase);
-			}
-
-			if (isMatch)
+			if (Utils.IsMatch(i.TriggerKey, triggerName))
 			{
 				Run(i);
 			}
@@ -115,7 +100,7 @@ public class Engine
 	{
 		if (instruction != null)
 		{
-			instruction.IsRunning = false;	//deferred
+			instruction.IsRunning = false;  //deferred
 		}
 	}
 
@@ -212,6 +197,16 @@ public class Engine
 				Parameters = parameters
 			};
 		}
+	}
+
+	public IEnumerable<Instruction> FindInstructions(
+	Func<Instruction, string> selector,
+	string query)
+	{
+		if (selector == null)
+			throw new ArgumentNullException(nameof(selector));
+
+		return allCommands.Where(i => Utils.IsMatch(selector(i), query));
 	}
 
 	private IEnumerable<Type> GetLoadableTypes(Assembly assembly)

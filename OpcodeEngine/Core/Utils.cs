@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,6 +8,29 @@ namespace OpcodeEngine.Core;
 
 public static class Utils
 {
+    public static bool IsMatch(string candidate, string query)
+    {
+        if (candidate == null || query == null)
+            return false;
+
+        if (query.Contains("*"))
+            return IsMatchWildcard(candidate, query);
+
+        if (candidate.Contains("*"))
+            return IsMatchWildcard(query, candidate);
+
+        return string.Equals(candidate, query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool HasPrefix(string prefix, ref string input)
+    {
+        if (string.IsNullOrEmpty(prefix) || string.IsNullOrEmpty(input) || !input.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+            return false;
+
+        input = input.Substring(prefix.Length);
+        return true;
+    }
+
     public static bool TryParseBool(string input, out bool result)
     {
         if (bool.TryParse(input, out result))
