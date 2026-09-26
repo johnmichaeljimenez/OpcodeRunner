@@ -21,7 +21,9 @@ public class Instruction
 		if (index >= Commands.Count)
 			return;
 
-		Commands[CurrentIndex].OnEnter();
+		var cmd = Commands[CurrentIndex];
+		cmd.ResolveDynamicParameters();
+		cmd.OnEnter();
 	}
 
 	public void Jump(string name)

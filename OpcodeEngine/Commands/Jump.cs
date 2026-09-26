@@ -2,42 +2,36 @@ using OpcodeEngine.Core;
 
 namespace OpcodeEngine.Commands
 {
-
 	public class Jump : Command
 	{
 		[CommandParameter]
-		protected string labelName = "";
-		
-		[CommandParameter]
-		private string key = "";
-
-		private bool hasKey;
-		protected bool inverted;
-
-		public override void OnInit()
-		{
-			hasKey = !string.IsNullOrEmpty(key);
-			if (!hasKey)
-				return;
-
-			key = key.ToUpper();
-			if (key.StartsWith("!"))
-			{
-				key = key.Substring(1);
-				inverted = true;
-			}
-		}
+		private string labelName = "";
 
 		public override void OnEnter()
 		{
-			bool shouldJump = !hasKey || (inverted ? !Condition : Condition);
-
-			if (!shouldJump)
-				return;
-
 			Instruction.Jump(labelName);
 		}
+	}
 
-		protected virtual bool Condition => Engine.SaveKeys.ContainsKey(key) && Engine.SaveKeys[key];
+	public class JumpIf : Command
+	{
+		[CommandParameter]
+		private string key = "";
+		[CommandParameter]
+		private string labelName = "";
+
+		public override void OnEnter()
+		{
+			var baseKey = key;
+			var invert = Utils.HasPrefix("!", ref baseKey);
+			var var = Engine.GetVar(baseKey);
+			Utils.TryParseBool(var.Value.ToString(), out var boolValue);
+
+			if (invert)
+				boolValue = !boolValue;
+
+			if (boolValue)
+				Instruction.Jump(labelName);
+		}
 	}
 }

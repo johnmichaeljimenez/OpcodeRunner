@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 using OpcodeEngine.Commands;
 
 namespace OpcodeEngine.Core;
@@ -22,7 +23,8 @@ public sealed class CommandParameterAttribute : Attribute { }
 
 public class Engine
 {
-	public readonly Dictionary<string, bool> SaveKeys = new();
+	public readonly List<Var> Vars = new();
+
 	private Dictionary<string, CommandType> commandTypes;
 
 	private readonly List<Instruction> allCommands = new();
@@ -300,5 +302,31 @@ public class Engine
 	protected virtual void OnPostExecuteCommand(Command command)
 	{
 
+	}
+
+	internal string ResolveReferences(string rawValue)
+	{
+		string s = rawValue.Trim();
+
+		if (s.Length < 4 || !s.StartsWith("[[", StringComparison.Ordinal) || !s.EndsWith("]]", StringComparison.Ordinal))
+			return rawValue;
+
+		string refName = s.Substring(2, s.Length - 4).Trim();
+
+		Var referenced = GetVar(refName);
+
+		if (referenced == null)
+			throw new InvalidOperationException($"Referenced Var '{refName}' was not found.");
+
+		if (referenced.Value == null)
+			throw new InvalidOperationException($"Referenced Var '{refName}' has no value.");
+
+		return Convert.ToString(referenced.Value, CultureInfo.InvariantCulture);
+	}
+
+	public Var GetVar(string name)
+	{
+		return Vars.FirstOrDefault(v =>
+			string.Equals(v.Name, name, StringComparison.OrdinalIgnoreCase));
 	}
 }

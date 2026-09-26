@@ -7,18 +7,59 @@ namespace OpcodeEngine.Commands
 	{
 		protected Engine Engine { get; private set; }
 		protected Instruction Instruction { get; private set; }
+
+		private CommandType _commandType;
+		private string[] _rawArgs;
+
+
 		internal void Initialize(Engine engine, Instruction instruction, CommandType commandType, string[] args)
 		{
 			Engine = engine;
 			Instruction = instruction;
+			_commandType = commandType;
+			_rawArgs = args;
 
 			// scan all args, then map them to commandType. if args is too few, use commandType's fields' default values.
 			for (int i = 0; i < commandType.Parameters.Count; i++)
 			{
 				var param = commandType.Parameters[i];
-				object value = i < args.Length && !args[i].Equals("<null>", StringComparison.InvariantCultureIgnoreCase)
+				bool hasArg = i < args.Length
+					&& !args[i].Equals("<null>", StringComparison.InvariantCultureIgnoreCase);
+
+				// [[var]] refs keep their default here; they're resolved at runtime
+				object value = hasArg && !IsReference(args[i])
 					? ConvertArgument(args[i], param.Type, param.Field.Name)
 					: param.DefaultValue;
+
+				param.Field.SetValue(this, value);
+			}
+		}
+
+		private static bool IsReference(string arg)
+		{
+			if (string.IsNullOrEmpty(arg)) return false;
+			var s = arg.Trim();
+			return s.Length >= 4
+				&& s.StartsWith("[[", StringComparison.Ordinal)
+				&& s.EndsWith("]]", StringComparison.Ordinal);
+		}
+
+		internal void ResolveDynamicParameters()
+		{
+			if (_commandType == null || _rawArgs == null) return;
+
+			for (int i = 0; i < _commandType.Parameters.Count; i++)
+			{
+				if (i >= _rawArgs.Length) continue;
+				string raw = _rawArgs[i];
+				if (!IsReference(raw)) continue;
+
+				var param = _commandType.Parameters[i];
+				string resolved = Engine.ResolveReferences(raw);
+
+				object value = param.Type == typeof(string)
+					? resolved
+					: ConvertArgument(resolved.Trim(), param.Type, param.Field.Name);
 
 				param.Field.SetValue(this, value);
 			}

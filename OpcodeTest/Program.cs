@@ -9,42 +9,20 @@ public class Program
 	public static void Main(string[] args)
 	{
 		var commandString = """
-		@NEW_GAME_START
+		@INIT
+		DECVAR MSG "HELLO WORLD" string
+		DECVAR FLAG false bool
+		JUMPIF FLAG END
 
-		PRINT "HELLO"
-		SAVE TEST TRUE
-		WAIT 0.2
-		JUMP OK TEST
-			PRINT "CONDITION NOT MET"
-		JUMP END
-		>OK
-			PRINT "CONDITION MET"
-		
-		START TEST2
-		RNG 0.4 RNG_OK
-		BREAK
-
-		>RNG_OK
-			PRINT "RNG OK!"
-
+		PRINT [[MSG]]
 		>END
-			PRINT "END"
 			BREAK
-		""";
-
-		var subCommandString = """
-		PRINT "HELLO 2!"
-		WAIT 0.5
-		PRINT "FIRST COMMAND SHOULD BE DONE BY NOW"
-		WAIT 5
-		PRINT "HELLO 2 END!"
 		""";
 
 		var engine = new Engine();
 		engine.Compile("Test", commandString);
-		engine.Compile("Test2", subCommandString);
 		
-		engine.FireTrigger("NEW_GAME_START");
+		engine.FireTrigger("INIT");
 
 		var stopwatch = Stopwatch.StartNew();
 		var lastTime = 0L;
