@@ -12,6 +12,9 @@ public class Program
 		@INIT
 		DECVAR CTR 10 int
 
+		PRINT "HAHA"
+		PRINT "LET'S GO"
+
 		PRINT "BEGIN COUNTDOWN!"
 		>LOOP
 			JUMPEQ CTR 1 END
@@ -25,9 +28,9 @@ public class Program
 			BREAK
 		""";
 
-		var engine = new Engine();
+		var engine = new Engine(immediateMode: true);
 		engine.Compile("Test", commandString);
-		
+
 		engine.FireTrigger("INIT");
 
 		var stopwatch = Stopwatch.StartNew();

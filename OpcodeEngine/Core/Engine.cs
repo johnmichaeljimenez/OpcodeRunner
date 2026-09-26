@@ -23,6 +23,7 @@ public sealed class CommandParameterAttribute : Attribute { }
 
 public class Engine
 {
+	public long CurrentTick { get; private set; }
 	public readonly List<Var> Vars = new();
 
 	private Dictionary<string, CommandType> commandTypes;
@@ -51,10 +52,12 @@ public class Engine
 	}
 
 	public bool IsRunning => runningCommands.Count > 0;
+	public bool ImmediateMode { get; set; } = false;
 
-	public Engine()
+	public Engine(bool immediateMode = false, int randomSeed = 0)
 	{
-		RandomSeed = DateTime.Now.Millisecond;
+		RandomSeed = randomSeed;
+		ImmediateMode = immediateMode;
 		InitRegistry();
 	}
 
@@ -108,6 +111,7 @@ public class Engine
 
 	public void Tick(float deltaTime)
 	{
+		CurrentTick++;
 		if (deltaTime <= 0 || runningCommands.Count == 0)
 			return;
 
@@ -116,29 +120,58 @@ public class Engine
 			if (i.IsPaused || i.CurrentIndex >= i.Commands.Count)
 				continue;
 
-			var line = i.Commands[i.CurrentIndex];
-			var currentIndex = i.CurrentIndex;
-			var updateDone = line.OnTick(deltaTime);
-
-			if (!updateDone)
-				continue;
-
-			line.OnExit();
-			OnPostExecuteCommand(line);
-
-			if (!i.IsRunning)
+			if (ImmediateMode)
 			{
-				_toRemove.Add(i);
-				continue;
+				while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
+				{
+					var line = i.Commands[i.CurrentIndex];
+					var currentIndex = i.CurrentIndex;
+					var updateDone = line.OnTick(deltaTime);
+
+					if (!updateDone)
+						break; //waiting
+
+					line.OnExit();
+					OnPostExecuteCommand(line);
+
+					if (!i.IsRunning)
+						break;
+
+					if (currentIndex != i.CurrentIndex)
+						continue; //jumped
+
+					i.SetIndex(i.CurrentIndex + 1);
+				}
+
+				if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
+					_toRemove.Add(i);
 			}
-
-			if (currentIndex != i.CurrentIndex) //someone modified index internally, ex. jump
-				continue;
-
-			i.SetIndex(i.CurrentIndex + 1);
-			if (i.CurrentIndex >= i.Commands.Count)
+			else
 			{
-				_toRemove.Add(i);
+				var line = i.Commands[i.CurrentIndex];
+				var currentIndex = i.CurrentIndex;
+				var updateDone = line.OnTick(deltaTime);
+
+				if (!updateDone)
+					continue;
+
+				line.OnExit();
+				OnPostExecuteCommand(line);
+
+				if (!i.IsRunning)
+				{
+					_toRemove.Add(i);
+					continue;
+				}
+
+				if (currentIndex != i.CurrentIndex)
+					continue;
+
+				i.SetIndex(i.CurrentIndex + 1);
+				if (i.CurrentIndex >= i.Commands.Count)
+				{
+					_toRemove.Add(i);
+				}
 			}
 		}
 

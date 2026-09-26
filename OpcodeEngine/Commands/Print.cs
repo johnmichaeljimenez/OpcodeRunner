@@ -9,7 +9,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			Console.WriteLine($"[{DateTime.Now:HH:mm:ss.f}] {msg}");
+			Console.WriteLine($"[{Engine.CurrentTick}] {msg}");
 		}
 	}
 }
