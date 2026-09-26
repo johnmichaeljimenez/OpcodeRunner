@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using OpcodeEngine.Commands;
 
 namespace OpcodeEngine.Core;
@@ -356,7 +357,7 @@ public class Engine : IDisposable
 
 	protected virtual void OnDispose()
 	{
-		
+
 	}
 
 	protected virtual void OnPostExecuteCommand(Command command)
@@ -366,22 +367,22 @@ public class Engine : IDisposable
 
 	internal string ResolveReferences(string rawValue)
 	{
-		string s = rawValue.Trim();
-
-		if (s.Length < 4 || !s.StartsWith("[[", StringComparison.Ordinal) || !s.EndsWith("]]", StringComparison.Ordinal))
+		if (string.IsNullOrEmpty(rawValue))
 			return rawValue;
 
-		string refName = s.Substring(2, s.Length - 4).Trim();
+		return Regex.Replace(rawValue, @"\[\[(.*?)\]\]", match =>
+		{
+			var refName = match.Groups[1].Value.Trim();
+			var referenced = GetVar(refName);
 
-		Var referenced = GetVar(refName);
+			if (referenced == null)
+				throw new InvalidOperationException($"Referenced Var '{refName}' was not found.");
 
-		if (referenced == null)
-			throw new InvalidOperationException($"Referenced Var '{refName}' was not found.");
+			if (referenced.Value == null)
+				throw new InvalidOperationException($"Referenced Var '{refName}' has no value.");
 
-		if (referenced.Value == null)
-			throw new InvalidOperationException($"Referenced Var '{refName}' has no value.");
-
-		return Convert.ToString(referenced.Value, CultureInfo.InvariantCulture);
+			return Convert.ToString(referenced.Value, CultureInfo.InvariantCulture);
+		});
 	}
 
 	public Var GetVar(string name)

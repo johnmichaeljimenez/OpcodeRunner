@@ -37,11 +37,10 @@ namespace OpcodeEngine.Commands
 
 		private static bool IsReference(string arg)
 		{
-			if (string.IsNullOrEmpty(arg)) return false;
-			var s = arg.Trim();
-			return s.Length >= 4
-				&& s.StartsWith("[[", StringComparison.Ordinal)
-				&& s.EndsWith("]]", StringComparison.Ordinal);
+			if (string.IsNullOrEmpty(arg))
+				return false;
+
+			return arg.Contains("[[");
 		}
 
 		internal void ResolveDynamicParameters()
