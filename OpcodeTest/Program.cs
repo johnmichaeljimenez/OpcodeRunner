@@ -10,10 +10,19 @@ public class Program
 	{
 		var commandString = """
 		@INIT
-		DECVAR SCORE 2 int
-		MUL SCORE 30
-		PRINT "MY SCORE IS"
-		PRINT [[SCORE]]
+		DECVAR CTR 10 int
+
+		PRINT "BEGIN COUNTDOWN!"
+		>LOOP
+			JUMPEQ CTR 1 END
+			SUB CTR 1
+			PRINT "[[CTR]]"
+			WAIT 1
+			JUMP LOOP
+
+		>END
+			PRINT "DONE!"
+			BREAK
 		""";
 
 		var engine = new Engine();
