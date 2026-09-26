@@ -113,4 +113,14 @@ namespace OpcodeEngine.Commands
 	{
 		protected override bool Compare(int comparisonResult) => comparisonResult < 0;
 	}
+
+	public class JumpGE : JumpCompare
+	{
+		protected override bool Compare(int comparisonResult) => comparisonResult >= 0;
+	}
+
+	public class JumpLE : JumpCompare
+	{
+		protected override bool Compare(int comparisonResult) => comparisonResult <= 0;
+	}
 }
