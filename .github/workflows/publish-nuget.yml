@@ -19,6 +19,9 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    - name: Run Unit Tests
+      run: dotnet test --configuration Release --no-restore --verbosity normal
+
     - name: Pack NuGet Package
       run: dotnet pack OpcodeEngine/OpcodeEngine.csproj -c Release -o ./nupkg
 

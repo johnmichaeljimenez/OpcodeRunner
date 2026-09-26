@@ -9,7 +9,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			Console.WriteLine($"[{Engine.CurrentTick}] {msg}");
+			Engine.OnOutput?.Invoke($"{msg}\n");
 		}
 	}
 }
