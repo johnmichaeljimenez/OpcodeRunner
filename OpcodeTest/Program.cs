@@ -10,13 +10,10 @@ public class Program
 	{
 		var commandString = """
 		@INIT
-		DECVAR MSG "HELLO WORLD" string
-		DECVAR FLAG false bool
-		JUMPIF FLAG END
-
-		PRINT [[MSG]]
-		>END
-			BREAK
+		DECVAR SCORE 2 int
+		MUL SCORE 30
+		PRINT "MY SCORE IS"
+		PRINT [[SCORE]]
 		""";
 
 		var engine = new Engine();
