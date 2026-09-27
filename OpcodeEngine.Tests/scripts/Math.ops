@@ -1,0 +1,17 @@
+@_INIT
+DECVAR X 10 int
+
+ADD X 5
+PRINT "[[X]]"
+
+SUB X 3
+PRINT "[[X]]"
+
+MUL X 4
+PRINT "[[X]]"
+
+#truncated
+DIV X 5
+PRINT "[[X]]"
+
+BREAK

@@ -19,6 +19,13 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_Math()
+    {
+        var engine = Utils.Test(out var output, "Math.ops");
+        output.Should().Be("15\n12\n48\n9");
+    }
+
+    [Fact]
     public void Test_Params()
     {
         var engine = Utils.Test(out var output, "Params.ops", "Params2.ops");
