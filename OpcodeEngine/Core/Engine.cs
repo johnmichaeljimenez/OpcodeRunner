@@ -81,13 +81,30 @@ public class Engine : IDisposable
 
 	public void FireTrigger(string triggerName)
 	{
+		if (string.IsNullOrEmpty(triggerName))
+			return;
+
+		var parts = new List<string>();
+		if (triggerName.Contains(' '))
+		{
+			parts = Utils.SplitArguments(triggerName);
+			triggerName = parts[0];
+			parts.RemoveAt(0);
+		}
+
 		foreach (var i in allCommands)
 		{
 			if (string.IsNullOrEmpty(i.TriggerKey))
 				continue;
 
-			if (Utils.IsMatch(i.TriggerKey, triggerName))
+			if (string.Equals(i.TriggerKey, triggerName, StringComparison.InvariantCultureIgnoreCase))
 			{
+				var parameters = i.TriggerParameters.Keys.ToList();
+				for (int j = 0; j < parts.Count; j++)   //input can be shorter than expected (TODO: provide default value for others)
+				{
+					i.TriggerParameters[parameters[j]] = parts[j];
+				}
+
 				Run(i);
 			}
 		}
@@ -252,9 +269,7 @@ public class Engine : IDisposable
 		}
 	}
 
-	public IEnumerable<Instruction> FindInstructions(
-	Func<Instruction, string> selector,
-	string query)
+	public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
 	{
 		if (selector == null)
 			throw new ArgumentNullException(nameof(selector));
@@ -306,10 +321,27 @@ public class Engine : IDisposable
 
 			if (eventCheck)    //event conditions must be at the top before command lines are defined
 			{
-				if (line.StartsWith("@"))
+				var triggerLine = line;
+				if (Utils.HasPrefix("@", ref triggerLine))
 				{
-					ins.TriggerKey = line.Substring(1).Trim().ToUpper();
 					eventCheck = false;
+					if (!line.Contains(' '))
+					{
+						ins.TriggerKey = triggerLine;
+						continue;
+					}
+
+					var lineParts = triggerLine.SplitArguments();
+					ins.TriggerKey = lineParts[0];
+
+					ins.TriggerParameters.Clear();
+					for (int j = 1; j < lineParts.Count; j++)
+					{
+						var varName = lineParts[j];
+						varName = varName.Replace("<", "").Replace(">", "");
+						ins.TriggerParameters.Add(varName, "");
+					}
+
 					continue;
 				}
 			}
@@ -365,12 +397,12 @@ public class Engine : IDisposable
 
 	}
 
-	internal string ResolveReferences(string rawValue)
+	internal string ResolveReferences(string rawValue, Instruction ins)
 	{
 		if (string.IsNullOrEmpty(rawValue))
 			return rawValue;
 
-		return Regex.Replace(rawValue, @"\[\[(.*?)\]\]", match =>
+		var current = Regex.Replace(rawValue, @"\[\[(.*?)\]\]", match =>
 		{
 			var refName = match.Groups[1].Value.Trim();
 			var referenced = GetVar(refName);
@@ -383,6 +415,19 @@ public class Engine : IDisposable
 
 			return Convert.ToString(referenced.Value, CultureInfo.InvariantCulture);
 		});
+
+		current = Regex.Replace(current, @"<(.*?)>", match =>
+		   {
+			   var refName = match.Groups[1].Value.Trim();
+			   var localValue = ins.TriggerParameters[refName];
+
+			   if (localValue == null)
+				   throw new InvalidOperationException($"Local parameter '{refName}' was not found.");
+
+			   return Convert.ToString(localValue, CultureInfo.InvariantCulture);
+		   });
+
+		return current;
 	}
 
 	public Var GetVar(string name)

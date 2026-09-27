@@ -4,13 +4,16 @@ namespace OpcodeEngine.Tests;
 
 public static class Utils
 {
-	internal static Engine Test(string scriptFileName, out string output)
+	internal static Engine Test(out string output, params string[] scriptFileNames)
 	{
-		scriptFileName = scriptFileName.Replace("\\", "/"); //for linux
-
 		var engineOutput = "";
 		var engine = new Engine(immediateMode: true);
-		engine.CompileFile($"scripts/{scriptFileName}");
+		foreach (var i in scriptFileNames)
+		{
+			var path = i.Replace("\\", "/"); //for linux
+			engine.CompileFile($"scripts/{path}");
+		}
+
 		engine.OnOutput += (str) => { engineOutput += $"{str}"; };
 		engine.Initialize();
 

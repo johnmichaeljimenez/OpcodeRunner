@@ -40,7 +40,7 @@ namespace OpcodeEngine.Commands
 			if (string.IsNullOrEmpty(arg))
 				return false;
 
-			return arg.Contains("[[");
+			return arg.Contains("[[") || arg.Contains("<");
 		}
 
 		internal void ResolveDynamicParameters()
@@ -54,7 +54,7 @@ namespace OpcodeEngine.Commands
 				if (!IsReference(raw)) continue;
 
 				var param = _commandType.Parameters[i];
-				string resolved = Engine.ResolveReferences(raw);
+				string resolved = Engine.ResolveReferences(raw, Instruction);
 
 				object value = param.Type == typeof(string)
 					? resolved

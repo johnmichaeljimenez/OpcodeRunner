@@ -4,10 +4,11 @@ namespace OpcodeEngine.Core;
 
 public class Instruction
 {
-	public string ID { get; set; }
-	public string TriggerKey { get; set; }
+	public string ID { get; internal set; }
+	public string TriggerKey { get; internal set; }
+	public readonly Dictionary<string, string> TriggerParameters = new();
 
-	public int CurrentIndex { get; set; }
+	public int CurrentIndex { get; private set; }
 	public bool IsPaused { get; set; }
 	public bool IsRunning { get; internal set; }
 
