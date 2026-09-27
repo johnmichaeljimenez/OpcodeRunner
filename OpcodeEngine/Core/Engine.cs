@@ -64,6 +64,45 @@ public class Engine : IDisposable
 		InitRegistry();
 	}
 
+	public void DumpCommands(params string[] selectedCommands)
+	{
+		if (commandTypes == null || commandTypes.Count == 0)
+			throw new InvalidOperationException("No commands found.");
+
+		var commandsToDump = commandTypes.Values.ToList();
+		if (selectedCommands != null && selectedCommands.Length > 0)
+		{
+			commandsToDump.RemoveAll(p => !selectedCommands.Contains(p.Name, StringComparer.InvariantCultureIgnoreCase));
+		}
+
+		var str = "";
+
+		foreach (var i in commandsToDump.OrderBy(p => p.Name))
+		{
+			str += $"===[ {i.Name} ]===\n";
+
+			if (i.Parameters.Count == 0)
+			{
+				str += $"	- <NO PARAMETERS>\n";
+			}
+			else
+			{
+				foreach (var j in i.Parameters)
+				{
+					var defValue = "<null>";
+					if (j.DefaultValue != null && j.DefaultValue.ToString().Length > 0)
+						defValue = j.DefaultValue.ToString();
+
+					str += $"	- {j.Field.Name} ({j.Type.Name}) = {defValue}\n";
+				}
+			}
+
+			str += "\n";
+		}
+
+		OnOutput?.Invoke(str);
+	}
+
 	public void Initialize()
 	{
 		OnInitialize();
@@ -117,7 +156,11 @@ public class Engine : IDisposable
 
 	public void Run(string id)
 	{
-		Run(allCommands.FirstOrDefault(p => string.Equals(id, p.ID, StringComparison.InvariantCultureIgnoreCase)));
+		var instruction = allCommands.FirstOrDefault(p => string.Equals(id, p.ID, StringComparison.InvariantCultureIgnoreCase));
+		if (instruction == null)
+			throw new InvalidOperationException($"Instruction '{id}' not found.");
+
+		Run(instruction);
 	}
 
 	public void Run(Instruction instruction)
