@@ -1,0 +1,4 @@
+@CALC_ADD <a> <b>
+
+SETVAR TEST <a>
+ADD TEST <b>
