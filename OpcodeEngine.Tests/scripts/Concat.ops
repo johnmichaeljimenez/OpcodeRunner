@@ -1,12 +1,11 @@
 @_INIT
 
-DECVAR MSG "Hello, your gold is: " string
-DECVAR GOLD 0 int
+DECVAR MSG "My gold is:" string
+DECVAR GOLD 30 int
+DECVAR COST 8 int
 
->LOOP
-	JUMPEQ GOLD 10 END
-	ADD GOLD 1
-	JUMP LOOP
+PRINT "[[MSG]] [[GOLD]]"
+PRINT "I will pay [[COST]]"
+SUB GOLD [[COST]]
 
->END
-	PRINT "[[MSG]][[GOLD]]"
+PRINT "[[MSG]] [[GOLD]]"
