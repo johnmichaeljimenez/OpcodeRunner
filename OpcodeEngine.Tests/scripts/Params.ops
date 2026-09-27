@@ -2,6 +2,4 @@
 
 DECVAR TEST 0 int
 CALL "CALC_ADD 8 4"
-#TODO: make CALL block the loop to make PRINT below receive TEST value properly without WAIT
-WAIT 0.1
 PRINT "THE SUM IS: [[TEST]]"

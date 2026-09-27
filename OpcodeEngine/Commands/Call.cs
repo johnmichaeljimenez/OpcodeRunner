@@ -7,9 +7,23 @@ namespace OpcodeEngine.Commands
 		[CommandParameter]
 		private string id;
 
+		private List<Instruction> _fired;
+
 		public override void OnEnter()
 		{
-			Engine.FireTrigger(id);
+			_fired = Engine.FireTrigger(id);
+		}
+
+		public override bool OnTick(float deltaTime)
+		{
+			if (_fired == null || _fired.Count == 0)
+				return true;
+
+			foreach (var ins in _fired)
+				if (ins.IsRunning)
+					return false; // blocked if anyone from _fired is still running
+
+			return true;
 		}
 	}
 }

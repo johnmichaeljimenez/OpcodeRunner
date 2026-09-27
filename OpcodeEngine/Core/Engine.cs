@@ -79,10 +79,12 @@ public class Engine : IDisposable
 		allCommands.Clear();
 	}
 
-	public void FireTrigger(string triggerName)
+	public List<Instruction> FireTrigger(string triggerName)
 	{
+		var fired = new List<Instruction>();
+
 		if (string.IsNullOrEmpty(triggerName))
-			return;
+			return fired;
 
 		var parts = new List<string>();
 		if (triggerName.Contains(' '))
@@ -106,8 +108,11 @@ public class Engine : IDisposable
 				}
 
 				Run(i);
+				fired.Add(i);
 			}
 		}
+
+		return fired;
 	}
 
 	public void Run(string id)
