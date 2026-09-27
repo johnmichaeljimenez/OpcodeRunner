@@ -1,0 +1,73 @@
+{
+  "name": "OpcodeRunner",
+  "scopeName": "source.ops",
+  "fileTypes": ["ops"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#trigger" },
+    { "include": "#label" },
+    { "include": "#string" },
+    { "include": "#interpolation" },
+    { "include": "#parameter" },
+    { "include": "#command" },
+    { "include": "#type" },
+    { "include": "#boolean" },
+    { "include": "#number" }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.number-sign.ops",
+      "match": "#.*$"
+    },
+    "trigger": {
+      "match": "^\\s*(@)(\\S+)",
+      "captures": {
+        "1": { "name": "punctuation.definition.trigger.ops" },
+        "2": { "name": "entity.name.function.trigger.ops" }
+      }
+    },
+    "label": {
+      "match": "^\\s*(>)\\s*(\\S+)",
+      "captures": {
+        "1": { "name": "keyword.control.label.ops" },
+        "2": { "name": "entity.name.label.ops" }
+      }
+    },
+    "string": {
+      "name": "string.quoted.double.ops",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        { "include": "#interpolation" },
+        { "include": "#parameter" }
+      ]
+    },
+    "interpolation": {
+      "name": "variable.other.interpolated.ops",
+      "begin": "\\[\\[",
+      "end": "\\]\\]"
+    },
+    "parameter": {
+      "name": "variable.parameter.ops",
+      "match": "<[^<>]+>"
+    },
+    "command": {
+      "match": "^\\s*(?![@#>])([A-Za-z_][A-Za-z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.control.command.ops" }
+      }
+    },
+    "type": {
+      "name": "storage.type.ops",
+      "match": "(?i)(?<=\\s)\\b(int|float|string|bool)\\b"
+    },
+    "boolean": {
+      "name": "constant.language.boolean.ops",
+      "match": "(?i)\\b(true|false)\\b"
+    },
+    "number": {
+      "match": "\\b-?\\d+(?:\\.\\d+)?\\b",
+      "name": "constant.numeric.ops"
+    }
+  }
+}

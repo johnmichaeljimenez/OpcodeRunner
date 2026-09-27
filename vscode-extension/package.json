@@ -1,0 +1,24 @@
+{
+  "name": "opcode-runner",
+  "displayName": "OpcodeRunner",
+  "description": "OpcodeRunner .ops syntax",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.74.0" },
+  "contributes": {
+    "languages": [
+      {
+        "id": "ops",
+        "aliases": ["OpcodeRunner"],
+        "extensions": [".ops"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ops",
+        "scopeName": "source.ops",
+        "path": "./ops.tmLanguage.json"
+      }
+    ]
+  }
+}
