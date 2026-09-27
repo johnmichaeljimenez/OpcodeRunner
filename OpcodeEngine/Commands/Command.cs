@@ -10,7 +10,8 @@ namespace OpcodeEngine.Commands
 
 		private CommandType _commandType;
 		private string[] _rawArgs;
-
+		
+		private Dictionary<int, string> _deferredArgs;
 
 		internal void Initialize(Engine engine, Instruction instruction, CommandType commandType, string[] args)
 		{
@@ -18,18 +19,63 @@ namespace OpcodeEngine.Commands
 			Instruction = instruction;
 			_commandType = commandType;
 			_rawArgs = args;
+			_deferredArgs = new Dictionary<int, string>();
 
-			// scan all args, then map them to commandType. if args is too few, use commandType's fields' default values.
 			for (int i = 0; i < commandType.Parameters.Count; i++)
 			{
 				var param = commandType.Parameters[i];
 				bool hasArg = i < args.Length
 					&& !args[i].Equals("<null>", StringComparison.InvariantCultureIgnoreCase);
 
-				// [[var]] refs keep their default here; they're resolved at runtime
-				object value = hasArg && !IsReference(args[i])
-					? ConvertArgument(args[i], param.Type, param.Field.Name)
-					: param.DefaultValue;
+				if (hasArg && !IsReference(args[i]))
+				{
+					try
+					{
+						object value = ConvertArgument(args[i], param.Type, param.Field.Name);
+						param.Field.SetValue(this, value);
+					}
+					catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
+					{
+						_deferredArgs[i] = args[i];
+						param.Field.SetValue(this, param.DefaultValue);
+					}
+				}
+				else
+				{
+					param.Field.SetValue(this, param.DefaultValue);
+				}
+			}
+		}
+
+		internal void ResolveDynamicParameters()
+		{
+			if (_commandType == null || _rawArgs == null) return;
+
+			for (int i = 0; i < _commandType.Parameters.Count; i++)
+			{
+				if (i >= _rawArgs.Length) continue;
+				string raw = _rawArgs[i];
+
+				bool isRef = IsReference(raw);
+				bool isDeferred = _deferredArgs != null && _deferredArgs.ContainsKey(i);
+
+				if (!isRef && !isDeferred) continue;
+
+				var param = _commandType.Parameters[i];
+				string resolved = Engine.ResolveReferences(raw, Instruction);
+
+				if (resolved == raw && isDeferred)
+				{
+					var nakedVar = Engine.GetVar(raw);
+					if (nakedVar != null && nakedVar.Value != null)
+					{
+						resolved = Convert.ToString(nakedVar.Value, CultureInfo.InvariantCulture);
+					}
+				}
+
+				object value = param.Type == typeof(string)
+					? resolved
+					: ConvertArgument(resolved.Trim(), param.Type, param.Field.Name);
 
 				param.Field.SetValue(this, value);
 			}
@@ -41,27 +87,6 @@ namespace OpcodeEngine.Commands
 				return false;
 
 			return arg.Contains("[[") || arg.Contains("<");
-		}
-
-		internal void ResolveDynamicParameters()
-		{
-			if (_commandType == null || _rawArgs == null) return;
-
-			for (int i = 0; i < _commandType.Parameters.Count; i++)
-			{
-				if (i >= _rawArgs.Length) continue;
-				string raw = _rawArgs[i];
-				if (!IsReference(raw)) continue;
-
-				var param = _commandType.Parameters[i];
-				string resolved = Engine.ResolveReferences(raw, Instruction);
-
-				object value = param.Type == typeof(string)
-					? resolved
-					: ConvertArgument(resolved.Trim(), param.Type, param.Field.Name);
-
-				param.Field.SetValue(this, value);
-			}
 		}
 
 		private static object ConvertArgument(string arg, Type type, string fieldName)
