@@ -50,8 +50,12 @@ public partial class EngineTests
     [Fact]
     public void Test_Immediate()
     {
-        var engine = Utils.Test(out var output, "Immediate.ops", "HelloWorld.ops", "Math.ops");
+        var engine = Utils.Test(out var output, true, "Immediate.ops", "HelloWorld.ops", "Math.ops");
         var tickCount = engine.CurrentTick;
         tickCount.Should().Be(1);
+        
+        engine = Utils.Test(out output, false, "Immediate.ops", "HelloWorld.ops", "Math.ops");
+        tickCount = engine.CurrentTick;
+        tickCount.Should().BeGreaterThanOrEqualTo(10);
     }
 }

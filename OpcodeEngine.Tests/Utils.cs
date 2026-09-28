@@ -6,8 +6,13 @@ public static class Utils
 {
 	internal static Engine Test(out string output, params string[] scriptFileNames)
 	{
+		return Test(out output, true, scriptFileNames);
+	}
+	
+	internal static Engine Test(out string output, bool immediateMode, params string[] scriptFileNames)
+	{
 		var engineOutput = "";
-		var engine = new Engine(immediateMode: true);
+		var engine = new Engine(immediateMode);
 		foreach (var i in scriptFileNames)
 		{
 			var path = i.Replace("\\", "/"); //for linux
