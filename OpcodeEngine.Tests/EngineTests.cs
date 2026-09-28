@@ -27,6 +27,13 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_Trigger()
+    {
+        var engine = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
+        output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2");
+    }
+
+    [Fact]
     public void Test_Concat()
     {
         var engine = Utils.Test(out var output, "Concat.ops");
