@@ -135,19 +135,28 @@ public class Engine : IDisposable
 
 		foreach (var i in allCommands)
 		{
-			if (string.IsNullOrEmpty(i.TriggerKey))
-				continue;
-
-			if (string.Equals(i.TriggerKey, triggerName, StringComparison.InvariantCultureIgnoreCase))
+			foreach (var trigger in i.Triggers)
 			{
-				var parameters = i.TriggerParameters.Keys.ToList();
-				for (int j = 0; j < parts.Count; j++)   //input can be shorter than expected (TODO: provide default value for others)
+				if (string.Equals(trigger.Key, triggerName, StringComparison.InvariantCultureIgnoreCase))
 				{
-					i.TriggerParameters[parameters[j]] = parts[j];
-				}
+					var parameters = trigger.Parameters.Keys.ToList();
+					for (int j = 0; j < parts.Count; j++)
+					{
+						if (j < parameters.Count)
+							trigger.Parameters[parameters[j]] = parts[j];
+					}
 
-				Run(i);
-				fired.Add(i);
+					i.TriggerKey = trigger.Key;
+					i.TriggerParameters.Clear();
+					foreach (var kvp in trigger.Parameters)
+					{
+						i.TriggerParameters[kvp.Key] = kvp.Value;
+					}
+
+					Run(i, trigger.StartIndex);
+					fired.Add(i);
+					break;
+				}
 			}
 		}
 
@@ -163,7 +172,7 @@ public class Engine : IDisposable
 		Run(instruction);
 	}
 
-	public void Run(Instruction instruction)
+	public void Run(Instruction instruction, int startIndex = 0)
 	{
 		if (instruction.IsRunning)
 			return;
@@ -173,7 +182,7 @@ public class Engine : IDisposable
 
 		instruction.IsRunning = true;
 		instruction.IsPaused = false;
-		instruction.SetIndex(0);
+		instruction.SetIndex(startIndex);
 
 		if (!runningCommands.Contains(instruction))
 			runningCommands.Add(instruction);
@@ -203,11 +212,27 @@ public class Engine : IDisposable
 			if (i.IsPaused || i.CurrentIndex >= i.Commands.Count)
 				continue;
 
+			var line = i.Commands[i.CurrentIndex];
+
+			if (line is _Trigger)
+			{
+				i.IsRunning = false;
+				_toRemove.Add(i);
+				continue;
+			}
+
 			if (ImmediateMode)
 			{
 				while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
 				{
-					var line = i.Commands[i.CurrentIndex];
+					line = i.Commands[i.CurrentIndex];
+					if (line is _Trigger)
+					{
+						i.IsRunning = false;
+						break;
+					}
+
+
 					var currentIndex = i.CurrentIndex;
 					var updateDone = line.OnTick(deltaTime);
 
@@ -231,7 +256,7 @@ public class Engine : IDisposable
 			}
 			else
 			{
-				var line = i.Commands[i.CurrentIndex];
+				line = i.Commands[i.CurrentIndex];
 				var currentIndex = i.CurrentIndex;
 				var updateDone = line.OnTick(deltaTime);
 
@@ -348,53 +373,58 @@ public class Engine : IDisposable
 		if (string.IsNullOrEmpty(code))
 			return null;
 
-		var ins = new Instruction()
-		{
-			ID = id
-		};
-
+		var ins = new Instruction() { ID = id };
 		var n = 0;
-		var eventCheck = true;
+
 		foreach (var i in code.Trim().Split(new[] { "\r\n", "\n" }, StringSplitOptions.None))
 		{
-			if (string.IsNullOrEmpty(i))
-				continue;
+			if (string.IsNullOrEmpty(i)) continue;
 
 			var line = i.Trim();
-			if (line.Length == 0)
-				continue;
+			if (line.Length == 0) continue;
+			if (line.StartsWith("#")) continue;
 
-			if (line.StartsWith("#"))
-				continue;
-
-			if (eventCheck)    //event conditions must be at the top before command lines are defined
+			if (line.StartsWith("@"))
 			{
-				var triggerLine = line;
-				if (Utils.HasPrefix("@", ref triggerLine))
+				var triggerLine = line.Substring(1).Trim();
+				var lineParts = triggerLine.SplitArguments();
+				var triggerKey = lineParts[0];
+
+				var triggerParams = new Dictionary<string, string>();
+				for (int j = 1; j < lineParts.Count; j++)
 				{
-					eventCheck = false;
-					if (!line.Contains(' '))
-					{
-						ins.TriggerKey = triggerLine;
-						continue;
-					}
-
-					var lineParts = triggerLine.SplitArguments();
-					ins.TriggerKey = lineParts[0];
-
-					ins.TriggerParameters.Clear();
-					for (int j = 1; j < lineParts.Count; j++)
-					{
-						var varName = lineParts[j];
-						varName = varName.Replace("<", "").Replace(">", "");
-						ins.TriggerParameters.Add(varName, "");
-					}
-
-					continue;
+					var varName = lineParts[j].Replace("<", "").Replace(">", "");
+					triggerParams.Add(varName, "");
 				}
-			}
 
-			eventCheck = false;
+				var cmd = new _Trigger
+				{
+					TriggerKey = triggerKey,
+					Parameters = triggerParams
+				};
+				cmd.Initialize(this, ins, commandTypes[nameof(_Trigger).ToUpper()], new string[0]);
+				cmd.OnInit();
+
+				ins.Triggers.Add(new TriggerDefinition
+				{
+					Key = triggerKey,
+					Parameters = triggerParams,
+					StartIndex = n + 1
+				});
+
+				ins.Labels[triggerKey] = n + 1;
+				if (ins.Triggers.Count == 1)
+				{
+					ins.TriggerKey = triggerKey;
+					ins.TriggerParameters.Clear();
+					foreach (var kvp in triggerParams)
+						ins.TriggerParameters[kvp.Key] = kvp.Value;
+				}
+
+				ins.Commands.Add(cmd);
+				n++;
+				continue;
+			}
 
 			if (line.StartsWith(">"))
 			{

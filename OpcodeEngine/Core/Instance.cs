@@ -1,39 +1,51 @@
+using System;
+using System.Collections.Generic;
 using OpcodeEngine.Commands;
 
-namespace OpcodeEngine.Core;
-
-public class Instruction
+namespace OpcodeEngine.Core
 {
-	public string ID { get; internal set; }
-	public string TriggerKey { get; internal set; }
-	public readonly Dictionary<string, string> TriggerParameters = new();
-
-	public int CurrentIndex { get; private set; }
-	public bool IsPaused { get; set; }
-	public bool IsRunning { get; internal set; }
-
-	public readonly List<Command> Commands = new();
-	public readonly Dictionary<string, int> Labels = new();
-
-	public void SetIndex(int index)
+	public class TriggerDefinition
 	{
-		CurrentIndex = index;
-
-		if (index >= Commands.Count)
-			return;
-
-		var cmd = Commands[CurrentIndex];
-		cmd.ResolveDynamicParameters();
-		cmd.OnEnter();
+		public string Key { get; set; }
+		public Dictionary<string, string> Parameters { get; set; } = new();
+		public int StartIndex { get; set; }
 	}
 
-	public void Jump(string name)
+	public class Instruction
 	{
-		if (!Labels.TryGetValue(name, out var index))
+		public string ID { get; internal set; }
+
+		public string TriggerKey { get; internal set; }
+		public readonly Dictionary<string, string> TriggerParameters = new();
+		public readonly List<TriggerDefinition> Triggers = new();
+
+		public int CurrentIndex { get; private set; }
+		public bool IsPaused { get; set; }
+		public bool IsRunning { get; internal set; }
+
+		public readonly List<Command> Commands = new();
+		public readonly Dictionary<string, int> Labels = new();
+
+		public void SetIndex(int index)
 		{
-			throw new InvalidOperationException($"Label '{name}' not found.");
+			CurrentIndex = index;
+
+			if (index >= Commands.Count)
+				return;
+
+			var cmd = Commands[CurrentIndex];
+			cmd.ResolveDynamicParameters();
+			cmd.OnEnter();
 		}
 
-		SetIndex(index);
+		public void Jump(string name)
+		{
+			if (!Labels.TryGetValue(name, out var index))
+			{
+				throw new InvalidOperationException($"Label '{name}' not found.");
+			}
+
+			SetIndex(index);
+		}
 	}
 }
