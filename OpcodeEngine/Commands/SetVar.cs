@@ -20,7 +20,7 @@ public class SetVar : Command
 	}
 }
 
-public class DecVar : Command
+public class DefVar : Command
 {
 	[CommandParameter]
 	private string key;

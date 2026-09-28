@@ -10,7 +10,7 @@ public class Program
 	{
 		var commandString = """
 		@_INIT
-		DECVAR CTR 10 int
+		DEFVAR CTR 10 int
 		PRINT "INITIALIZED PROGRAM"
 
 		PRINT "BEGIN COUNTDOWN"

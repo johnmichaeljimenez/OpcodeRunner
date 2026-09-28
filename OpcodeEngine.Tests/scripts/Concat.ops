@@ -1,8 +1,8 @@
 @_INIT
 
-DECVAR MSG "My gold is:" string
-DECVAR GOLD 30 int
-DECVAR COST 8 int
+DEFVAR MSG "My gold is:" string
+DEFVAR GOLD 30 int
+DEFVAR COST 8 int
 
 PRINT "[[MSG]] [[GOLD]]"
 PRINT "I will pay [[COST]]"

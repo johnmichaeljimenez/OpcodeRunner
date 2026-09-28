@@ -1,5 +1,5 @@
 @_INIT
-DECVAR X 10 int
+DEFVAR X 10 int
 
 ADD X 5
 PRINT "[[X]]"

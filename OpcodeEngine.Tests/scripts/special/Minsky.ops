@@ -1,13 +1,13 @@
 @_INIT
 
 #input 1
-DECVAR A 3 int
+DEFVAR A 3 int
 #input 2
-DECVAR B 4 int
+DEFVAR B 4 int
 
-DECVAR C 0 int
-DECVAR T 0 int
-DECVAR STEPS 0 int
+DEFVAR C 0 int
+DEFVAR T 0 int
+DEFVAR STEPS 0 int
 
 > M0
 	ADD STEPS 1
