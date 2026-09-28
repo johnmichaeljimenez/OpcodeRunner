@@ -1,3 +1,8 @@
 @GREET <msg> <num>
-
 PRINT "<msg> I AM FROM TRIGGER2, MY NUMBER IS <num>"
+
+@RESPOND <msg>
+PRINT "MY RESPONSE IS: <msg>"
+
+@FOLLOWUP <msg>
+PRINT "FOLLOWUP: <msg>"

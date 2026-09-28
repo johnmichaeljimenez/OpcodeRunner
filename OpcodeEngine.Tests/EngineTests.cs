@@ -30,7 +30,7 @@ public partial class EngineTests
     public void Test_Trigger()
     {
         var engine = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
-        output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2");
+        output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2, MY NUMBER IS 120\nMY RESPONSE IS: GOODBYE\nFOLLOWUP: WHY?");
     }
 
     [Fact]
