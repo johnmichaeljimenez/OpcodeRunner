@@ -65,4 +65,14 @@ public partial class EngineTests
         tickCount = engine.CurrentTick;
         tickCount.Should().BeGreaterThanOrEqualTo(10);
     }
+
+    [Fact]
+    public void Test_RNG()
+    {
+        var engine = Utils.Test(out var output, true);
+        engine.RNG.Should().NotBeNull();
+
+        engine.RandomSeed = 12;
+        engine.RandomSeed.Should().Be(12);
+    }
 }

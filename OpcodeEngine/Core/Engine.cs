@@ -34,7 +34,7 @@ public class Engine : IDisposable
 	private readonly List<Instruction> _toRemove = new();
 
 	public Random RNG { get; private set; }
-	private int _randomSeed;
+	private int _randomSeed = -1;
 	public int RandomSeed
 	{
 		get
