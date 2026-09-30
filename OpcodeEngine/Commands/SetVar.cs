@@ -16,7 +16,9 @@ public class SetVar : Command
 	public override void OnEnter()
 	{
 		base.OnEnter();
-		Engine.GetVar(key).SetValue(value, relative);
+		var v = Engine.GetVar(key, Instruction)
+			?? throw new InvalidOperationException($"Var '{key}' not found.");
+		v.SetValue(value, relative);
 	}
 }
 
@@ -35,16 +37,14 @@ public class DefVar : Command
 	{
 		base.OnEnter();
 
-		var newVar = new Var()
-		{
-			Name = key,
-			Type = GetStringType()
-		};
+		var isLocal = key != null && key.StartsWith("_", StringComparison.Ordinal);
+		var vars = isLocal ? Instruction.Vars : Engine.Vars;
 
-		if (Engine.GetVar(key) != null)
+		if (vars.Any(v => string.Equals(v.Name, key, StringComparison.OrdinalIgnoreCase)))
 			throw new Exception($"Var '{key}' already exists.");
 
-		Engine.Vars.Add(newVar);
+		var newVar = new Var { Name = key, Type = GetStringType() };
+		vars.Add(newVar);
 		newVar.SetValue(value, false);
 	}
 

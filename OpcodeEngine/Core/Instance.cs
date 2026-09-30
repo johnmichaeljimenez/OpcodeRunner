@@ -26,6 +26,8 @@ namespace OpcodeEngine.Core
 		public readonly List<Command> Commands = new();
 		public readonly Dictionary<string, int> Labels = new();
 
+		public readonly List<Var> Vars = new();
+
 		public void SetIndex(int index)
 		{
 			CurrentIndex = index;
@@ -46,6 +48,11 @@ namespace OpcodeEngine.Core
 			}
 
 			SetIndex(index);
+		}
+
+		internal void ClearLocalVars()
+		{
+			Vars.Clear();
 		}
 	}
 }

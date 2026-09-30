@@ -17,7 +17,7 @@ namespace OpcodeEngine.Commands
 		{
 			base.OnEnter();
 
-			var var = Engine.GetVar(key);
+			var var = Engine.GetVar(key, Instruction);
 
 			if (var == null)
 				throw new InvalidOperationException($"Var '{key}' was not found.");

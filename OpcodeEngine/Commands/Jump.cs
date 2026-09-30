@@ -25,7 +25,7 @@ namespace OpcodeEngine.Commands
 		{
 			var baseKey = key;
 			var invert = Utils.HasPrefix("!", ref baseKey);
-			var var = Engine.GetVar(baseKey);
+			var var = Engine.GetVar(baseKey, Instruction);
 			Utils.TryParseBool(var.Value.ToString(), out var boolValue);
 
 			if (invert)
@@ -60,7 +60,7 @@ namespace OpcodeEngine.Commands
 
 		private object ResolveOperand(string operand)
 		{
-			var var = Engine.GetVar(operand);
+			var var = Engine.GetVar(operand, Instruction);
 			return var != null ? var.Value : operand;
 		}
 

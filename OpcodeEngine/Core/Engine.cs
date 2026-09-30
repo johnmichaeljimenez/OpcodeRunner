@@ -182,6 +182,7 @@ public class Engine : IDisposable
 
 		instruction.IsRunning = true;
 		instruction.IsPaused = false;
+		instruction.ClearLocalVars();
 		instruction.SetIndex(startIndex);
 
 		if (!runningCommands.Contains(instruction))
@@ -483,7 +484,7 @@ public class Engine : IDisposable
 		var current = Regex.Replace(rawValue, @"\[\[(.*?)\]\]", match =>
 		{
 			var refName = match.Groups[1].Value.Trim();
-			var referenced = GetVar(refName);
+			var referenced = GetVar(refName, ins);
 
 			if (referenced == null)
 				throw new InvalidOperationException($"Referenced Var '{refName}' was not found.");
@@ -508,8 +509,15 @@ public class Engine : IDisposable
 		return current;
 	}
 
-	public Var GetVar(string name)
+	public Var GetVar(string name, Instruction scope)
 	{
+		if (string.IsNullOrEmpty(name))
+			return null;
+
+		if (scope != null && name[0] == '_')
+			return scope.Vars.FirstOrDefault(v =>
+				string.Equals(v.Name, name, StringComparison.OrdinalIgnoreCase));
+
 		return Vars.FirstOrDefault(v =>
 			string.Equals(v.Name, name, StringComparison.OrdinalIgnoreCase));
 	}

@@ -5,8 +5,8 @@ namespace OpcodeEngine.Commands;
 
 internal static class ListAccess
 {
-	public static OpList Get(Engine e, string key) =>
-		e.GetVar(key)?.Value as OpList
+	public static OpList Get(Engine e, string key, Instruction scope) =>
+		e.GetVar(key, scope)?.Value as OpList
 			?? throw new InvalidOperationException($"'{key}' is not a list.");
 
 	public static int Index(OpList l, string raw, bool allowEnd = false)
@@ -30,7 +30,10 @@ public class DefList : Command
 
 	public override void OnEnter()
 	{
-		if (Engine.GetVar(key) != null)
+		bool isLocal = key != null && key.StartsWith("_", StringComparison.Ordinal);
+		var vars = isLocal ? Instruction.Vars : Engine.Vars;
+
+		if (vars.Any(v => string.Equals(v.Name, key, StringComparison.OrdinalIgnoreCase)))
 			throw new Exception($"Var '{key}' already exists.");
 
 		var t = elementType?.ToLowerInvariant() switch
@@ -42,7 +45,7 @@ public class DefList : Command
 			_ => throw new NotSupportedException($"Unknown list element type '{elementType}'.")
 		};
 
-		Engine.Vars.Add(new Var { Name = key, Type = typeof(OpList), Value = new OpList(t) });
+		vars.Add(new Var { Name = key, Type = typeof(OpList), Value = new OpList(t) });
 	}
 }
 
@@ -53,7 +56,7 @@ public class ListAdd : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
+		var l = ListAccess.Get(Engine, key, Instruction);
 		l.Items.Add(ListAccess.Parse(l, value, nameof(value)));
 	}
 }
@@ -66,7 +69,7 @@ public class ListSet : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
+		var l = ListAccess.Get(Engine, key, Instruction);
 		l.Items[ListAccess.Index(l, index)] = ListAccess.Parse(l, value, nameof(value));
 	}
 }
@@ -79,7 +82,7 @@ public class ListInsert : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
+		var l = ListAccess.Get(Engine, key, Instruction);
 		l.Items.Insert(ListAccess.Index(l, index, allowEnd: true),
 					   ListAccess.Parse(l, value, nameof(value)));
 	}
@@ -92,7 +95,7 @@ public class ListRemove : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
+		var l = ListAccess.Get(Engine, key, Instruction);
 		l.Items.RemoveAt(ListAccess.Index(l, index));
 	}
 }
@@ -100,7 +103,7 @@ public class ListRemove : Command
 public class ListClear : Command
 {
 	[CommandParameter] private string key;
-	public override void OnEnter() => ListAccess.Get(Engine, key).Items.Clear();
+	public override void OnEnter() => ListAccess.Get(Engine, key, Instruction).Items.Clear();
 }
 
 public class ListGet : Command
@@ -111,8 +114,8 @@ public class ListGet : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
-		var v = Engine.GetVar(outVar) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
+		var l = ListAccess.Get(Engine, key, Instruction);
+		var v = Engine.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
 
 		// store as the natural element type so [[outVar]] and math work normally
 		v.Value = l.ElementType == typeof(string)
@@ -130,8 +133,8 @@ public class ListCount : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key);
-		var v = Engine.GetVar(outVar) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
+		var l = ListAccess.Get(Engine, key, Instruction);
+		var v = Engine.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
 		v.SetValue(l.Items.Count.ToString(CultureInfo.InvariantCulture), false);
 	}
 }

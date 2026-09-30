@@ -66,7 +66,7 @@ namespace OpcodeEngine.Commands
 
 				if (resolved == raw && isDeferred)
 				{
-					var nakedVar = Engine.GetVar(raw);
+					var nakedVar = Engine.GetVar(raw, Instruction);
 					if (nakedVar != null && nakedVar.Value != null)
 					{
 						resolved = Convert.ToString(nakedVar.Value, CultureInfo.InvariantCulture);
