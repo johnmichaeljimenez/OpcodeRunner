@@ -37,7 +37,7 @@ public partial class EngineTests
     public void Test_Trigger()
     {
         var engine = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
-        output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2, MY NUMBER IS 120\nMY RESPONSE IS: GOODBYE\nFOLLOWUP: WHY?");
+        output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2, MY NUMBER IS 120\nMY RESPONSE IS: GOODBYE\nFOLLOWUP: WHY?\nTrue");
     }
 
     [Fact]
@@ -81,5 +81,12 @@ public partial class EngineTests
 
         engine.RandomSeed = 12;
         engine.RandomSeed.Should().Be(12);
+    }
+
+    [Fact]
+    public void Test_Lists()
+    {
+        var engine = Utils.Test(out var output, "Lists.ops");
+        output.Should().Be("apple\nbanana\ncherry");
     }
 }

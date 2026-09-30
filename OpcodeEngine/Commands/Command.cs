@@ -89,7 +89,7 @@ namespace OpcodeEngine.Commands
 			return arg.Contains("[[") || arg.Contains("<");
 		}
 
-		private static object ConvertArgument(string arg, Type type, string fieldName)
+		internal static object ConvertArgument(string arg, Type type, string fieldName)
 		{
 			if (type == typeof(string))
 				return arg;
