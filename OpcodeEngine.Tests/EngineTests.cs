@@ -20,6 +20,13 @@ public partial class EngineTests
     }
 
     [Fact]
+    public void Test_Regex()
+    {
+        var strSplitArg = """CALL "HELLO WORLD HE SAYS "HI"" 10""";
+        Core.Utils.SplitArguments(strSplitArg).Should().BeEquivalentTo("CALL", "HELLO WORLD HE SAYS HI", "10");
+    }
+
+    [Fact]
     public void Test_HelloWorld()
     {
         var engine = Utils.Test(out var output, "HelloWorld.ops");
