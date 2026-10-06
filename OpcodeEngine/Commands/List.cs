@@ -3,8 +3,18 @@ using OpcodeEngine.Core;
 
 namespace OpcodeEngine.Commands;
 
-internal static class ListAccess
+public static class ListAccess
 {
+	public static void Set(Engine e, string key, Instruction scope, params object[] values)
+	{
+		var list = Get(e, key, scope);
+		if (list == null)
+			throw new InvalidOperationException($"List '{key}' not found.");
+
+		list.Items.Clear();
+		list.Items.AddRange(values);
+	}
+
 	public static OpList Get(Engine e, string key, Instruction scope) =>
 		e.GetVar(key, scope)?.Value as OpList
 			?? throw new InvalidOperationException($"'{key}' is not a list.");
