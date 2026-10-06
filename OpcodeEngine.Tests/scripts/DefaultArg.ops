@@ -1,0 +1,12 @@
+@_INIT
+
+#unquoted * uses the parameter default, quoted "*" is a literal asterisk
+PRINT *
+PRINT "*"
+
+DEFVAR N 5 int
+ADD N *
+PRINT [[N]]
+
+SETVAR N 9 *
+PRINT [[N]]

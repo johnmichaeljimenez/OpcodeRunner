@@ -9,6 +9,7 @@
     { "include": "#string" },
     { "include": "#interpolation" },
     { "include": "#parameter" },
+    { "include": "#defaultArg" },
     { "include": "#command" },
     { "include": "#type" },
     { "include": "#boolean" },
@@ -50,6 +51,12 @@
     "parameter": {
       "name": "variable.parameter.ops",
       "match": "<[^<>]+>"
+    },
+    "defaultArg": {
+      "match": "(^|[\\t ])(\\*)(?=[\\t ]|$)",
+      "captures": {
+        "2": { "name": "constant.language.default.ops" }
+      }
     },
     "command": {
       "match": "^\\s*(?![@#>])([A-Za-z_][A-Za-z0-9_]*)\\b",

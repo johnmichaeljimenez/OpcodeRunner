@@ -9,11 +9,11 @@ namespace OpcodeEngine.Commands
 		protected Instruction Instruction { get; private set; }
 
 		private CommandType _commandType;
-		private string[] _rawArgs;
+		private ArgumentToken[] _rawArgs;
 		
 		private Dictionary<int, string> _deferredArgs;
 
-		internal void Initialize(Engine engine, Instruction instruction, CommandType commandType, string[] args)
+		internal void Initialize(Engine engine, Instruction instruction, CommandType commandType, ArgumentToken[] args)
 		{
 			Engine = engine;
 			Instruction = instruction;
@@ -24,19 +24,18 @@ namespace OpcodeEngine.Commands
 			for (int i = 0; i < commandType.Parameters.Count; i++)
 			{
 				var param = commandType.Parameters[i];
-				bool hasArg = i < args.Length
-					&& !args[i].Equals("<null>", StringComparison.InvariantCultureIgnoreCase);
+				bool hasArg = i < args.Length && !args[i].IsDefault;
 
-				if (hasArg && !IsReference(args[i]))
+				if (hasArg && !IsReference(args[i].Value))
 				{
 					try
 					{
-						object value = ConvertArgument(args[i], param.Type, param.Field.Name);
+						object value = ConvertArgument(args[i].Value, param.Type, param.Field.Name);
 						param.Field.SetValue(this, value);
 					}
 					catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
 					{
-						_deferredArgs[i] = args[i];
+						_deferredArgs[i] = args[i].Value;
 						param.Field.SetValue(this, param.DefaultValue);
 					}
 				}
@@ -54,7 +53,8 @@ namespace OpcodeEngine.Commands
 			for (int i = 0; i < _commandType.Parameters.Count; i++)
 			{
 				if (i >= _rawArgs.Length) continue;
-				string raw = _rawArgs[i];
+				if (_rawArgs[i].IsDefault) continue;
+				string raw = _rawArgs[i].Value;
 
 				bool isRef = IsReference(raw);
 				bool isDeferred = _deferredArgs != null && _deferredArgs.ContainsKey(i);

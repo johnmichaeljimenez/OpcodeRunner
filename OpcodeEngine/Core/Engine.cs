@@ -89,7 +89,7 @@ public class Engine : IDisposable
 			{
 				foreach (var j in i.Parameters)
 				{
-					var defValue = "<null>";
+					var defValue = "*";
 					if (j.DefaultValue != null && j.DefaultValue.ToString().Length > 0)
 						defValue = j.DefaultValue.ToString();
 
@@ -403,7 +403,7 @@ public class Engine : IDisposable
 					TriggerKey = triggerKey,
 					Parameters = triggerParams
 				};
-				cmd.Initialize(this, ins, commandTypes[nameof(_Trigger).ToUpper()], new string[0]);
+				cmd.Initialize(this, ins, commandTypes[nameof(_Trigger).ToUpper()], Array.Empty<ArgumentToken>());
 				cmd.OnInit();
 
 				ins.Triggers.Add(new TriggerDefinition
@@ -437,8 +437,8 @@ public class Engine : IDisposable
 				continue;
 			}
 
-			var parts = line.SplitArguments();
-			var typeName = parts[0].ToUpper();
+			var parts = line.SplitArgumentTokens();
+			var typeName = parts[0].Value.ToUpper();
 
 			if (!commandTypes.TryGetValue(typeName, out var type))
 				throw new Exception($"Unknown command: '{typeName}'");

@@ -89,4 +89,11 @@ public partial class EngineTests
         var engine = Utils.Test(out var output, "Lists.ops");
         output.Should().Be("apple\nbanana\ncherry");
     }
+
+    [Fact]
+    public void Test_DefaultArg()
+    {
+        var engine = Utils.Test(out var output, "DefaultArg.ops");
+        output.Should().Be("<empty>\n*\n5\n9");
+    }
 }

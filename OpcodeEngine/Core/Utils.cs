@@ -6,6 +6,23 @@ using System.Text.RegularExpressions;
 
 namespace OpcodeEngine.Core;
 
+public readonly struct ArgumentToken
+{
+    public string Value { get; }
+    public bool Quoted { get; }
+
+    public ArgumentToken(string value, bool quoted)
+    {
+        Value = value;
+        Quoted = quoted;
+    }
+
+    public bool IsDefault =>
+        !Quoted && Value == "*";
+
+    public override string ToString() => Value;
+}
+
 public static class Utils
 {
     public static bool IsMatch(string candidate, string query)
@@ -55,9 +72,15 @@ public static class Utils
 
     public static List<string> SplitArguments(this string input)
     {
-        var result = new List<string>();
+        return SplitArgumentTokens(input).Select(t => t.Value).ToList();
+    }
+
+    public static List<ArgumentToken> SplitArgumentTokens(this string input)
+    {
+        var result = new List<ArgumentToken>();
         var currentToken = new StringBuilder();
         bool inQuotes = false;
+        bool tokenQuoted = false;
 
         for (int i = 0; i < input.Length; i++)
         {
@@ -66,6 +89,7 @@ public static class Utils
             if (c == '"')   //YAGNI: no double quotes needed yet
             {
                 inQuotes = !inQuotes;
+                tokenQuoted = true;
                 continue;
             }
 
@@ -73,8 +97,9 @@ public static class Utils
             {
                 if (currentToken.Length > 0)
                 {
-                    result.Add(currentToken.ToString());
+                    result.Add(new ArgumentToken(currentToken.ToString(), tokenQuoted));
                     currentToken.Clear();
+                    tokenQuoted = false;
                 }
             }
             else
@@ -85,7 +110,7 @@ public static class Utils
 
         if (currentToken.Length > 0)
         {
-            result.Add(currentToken.ToString());
+            result.Add(new ArgumentToken(currentToken.ToString(), tokenQuoted));
         }
 
         return result;
