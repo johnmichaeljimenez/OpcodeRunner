@@ -1,4 +1,5 @@
 using FluentAssertions;
+using OpcodeEngine.Commands;
 using OpcodeEngine.Core;
 
 namespace OpcodeEngine.Tests;
@@ -67,7 +68,7 @@ public partial class EngineTests
         var engine = Utils.Test(out var output, true, "Immediate.ops", "HelloWorld.ops", "Math.ops");
         var tickCount = engine.CurrentTick;
         tickCount.Should().Be(1);
-        
+
         engine = Utils.Test(out output, false, "Immediate.ops", "HelloWorld.ops", "Math.ops");
         tickCount = engine.CurrentTick;
         tickCount.Should().BeGreaterThanOrEqualTo(10);
@@ -87,7 +88,7 @@ public partial class EngineTests
     public void Test_Lists()
     {
         var engine = Utils.Test(out var output, "Lists.ops");
-        output.Should().Be("apple\nbanana\ncherry");
+        output.Should().Be("apple\nbanana\ncherry\n5\n10\n25\nSUM: 40");
     }
 
     [Fact]
@@ -95,5 +96,55 @@ public partial class EngineTests
     {
         var engine = Utils.Test(out var output, "DefaultArg.ops");
         output.Should().Be("<empty>\n*\n5\n9");
+    }
+
+    [Fact]
+    public void Test_TriggerSequence()
+    {
+        var engine = new Engine();
+        engine.CompileFile("scripts/Sequence.ops");
+        engine.Initialize();
+
+        var output = "";
+        engine.OnOutput += str => output += $"{str}";
+
+        var seq = new TriggerSequence(engine);
+        seq.Enqueue("SECOND");
+        seq.Enqueue("FIRST");
+        seq.Enqueue("   ");//should be ignored
+        seq.Enqueue(null);//should be ignored
+
+        while (true)
+        {
+            seq.Tick();
+            engine.Tick(0.033333f);
+            if (seq.Tick() && !engine.IsRunning)
+                break;
+        }
+
+        output.Trim().Should().Be("B1\nA1\nA2");
+    }
+
+    [Fact]
+    public void Test_TriggerSequence_TickContract()
+    {
+        var engine = new Engine();
+        engine.CompileFile("scripts/Sequence.ops");
+        engine.Initialize();
+
+        var output = "";
+        engine.OnOutput += str => output += $"{str}";
+
+        var seq = new TriggerSequence(engine);
+        seq.Tick().Should().BeTrue();//empty queue -> done immediately
+
+        seq.Enqueue("FIRST");
+        seq.Tick().Should().BeFalse();//something fired and is running
+
+        while (!seq.Tick())
+            engine.Tick(0.033333f);
+
+        output.Should().Contain("A1\nA2");
+        seq.Tick().Should().BeTrue();//drained
     }
 }
