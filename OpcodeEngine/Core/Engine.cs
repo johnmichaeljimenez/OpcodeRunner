@@ -53,11 +53,11 @@ public class Engine : IDisposable
 	}
 
 	public bool IsRunning => runningCommands.Count > 0;
-	public bool ImmediateMode { get; private set; } = false;
+	public bool ImmediateMode { get; private set; } = true;
 
 	public Action<string> OnOutput;
 
-	public Engine(bool immediateMode = false, int randomSeed = 0)
+	public Engine(bool immediateMode = true, int randomSeed = 0)
 	{
 		RandomSeed = randomSeed;
 		ImmediateMode = immediateMode;
