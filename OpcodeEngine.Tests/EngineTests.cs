@@ -11,7 +11,7 @@ public partial class EngineTests
     {
         var commands = new string[] { "WAIT", "MUL", "JUMPIF" };
         var engineOutput = "";
-        var engine = new Engine(immediateMode: true);
+        var engine = new Engine();
 
         engine.OnOutput += (str) => { engineOutput += $"{str}"; };
         engine.DumpCommands(commands);
@@ -63,15 +63,11 @@ public partial class EngineTests
     }
 
     [Fact]
-    public void Test_Immediate()
+    public void Test_ExecOrder()
     {
-        var engine = Utils.Test(out var output, true, "Immediate.ops", "HelloWorld.ops", "Math.ops");
+        var engine = Utils.Test(out var output, true, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
         var tickCount = engine.CurrentTick;
         tickCount.Should().Be(1);
-
-        engine = Utils.Test(out output, false, "Immediate.ops", "HelloWorld.ops", "Math.ops");
-        tickCount = engine.CurrentTick;
-        tickCount.Should().BeGreaterThanOrEqualTo(10);
     }
 
     [Fact]

@@ -53,14 +53,12 @@ public class Engine : IDisposable
 	}
 
 	public bool IsRunning => runningCommands.Count > 0;
-	public bool ImmediateMode { get; private set; } = true;
 
 	public Action<string> OnOutput;
 
-	public Engine(bool immediateMode = true, int randomSeed = 0)
+	public Engine(int randomSeed = 0)
 	{
 		RandomSeed = randomSeed;
-		ImmediateMode = immediateMode;
 		InitRegistry();
 	}
 
@@ -222,66 +220,36 @@ public class Engine : IDisposable
 				continue;
 			}
 
-			if (ImmediateMode)
-			{
-				while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
-				{
-					line = i.Commands[i.CurrentIndex];
-					if (line is _Trigger)
-					{
-						i.IsRunning = false;
-						break;
-					}
-
-
-					var currentIndex = i.CurrentIndex;
-					var updateDone = line.OnTick(deltaTime);
-
-					if (!updateDone)
-						break; //waiting
-
-					line.OnExit();
-					OnPostExecuteCommand(line);
-
-					if (!i.IsRunning)
-						break;
-
-					if (currentIndex != i.CurrentIndex)
-						continue; //jumped
-
-					i.SetIndex(i.CurrentIndex + 1);
-				}
-
-				if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
-					_toRemove.Add(i);
-			}
-			else
+			while (i.IsRunning && !i.IsPaused && i.CurrentIndex < i.Commands.Count)
 			{
 				line = i.Commands[i.CurrentIndex];
+				if (line is _Trigger)
+				{
+					i.IsRunning = false;
+					break;
+				}
+
+
 				var currentIndex = i.CurrentIndex;
 				var updateDone = line.OnTick(deltaTime);
 
 				if (!updateDone)
-					continue;
+					break; //waiting
 
 				line.OnExit();
 				OnPostExecuteCommand(line);
 
 				if (!i.IsRunning)
-				{
-					_toRemove.Add(i);
-					continue;
-				}
+					break;
 
 				if (currentIndex != i.CurrentIndex)
-					continue;
+					continue; //jumped
 
 				i.SetIndex(i.CurrentIndex + 1);
-				if (i.CurrentIndex >= i.Commands.Count)
-				{
-					_toRemove.Add(i);
-				}
 			}
+
+			if (!i.IsRunning || i.CurrentIndex >= i.Commands.Count)
+				_toRemove.Add(i);
 		}
 
 		for (int i = _toRemove.Count - 1; i >= 0; i--)
