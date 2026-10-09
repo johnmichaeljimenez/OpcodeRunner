@@ -23,7 +23,7 @@ public partial class EngineTests
     public void Test_Directory()
     {
         var vm = new VirtualMachine();
-        vm.CompileDirectory("scripts", "ops");
+        vm.CompileDirectory("scripts", "ysl");
         vm.FindInstruction("DefaultArg").Should().NotBeNull();
         vm.FindInstruction("special/Minsky").Should().NotBeNull();
     }
@@ -38,42 +38,42 @@ public partial class EngineTests
     [Fact]
     public void Test_HelloWorld()
     {
-        var vm = Utils.Test(out var output, "HelloWorld.ops");
+        var vm = Utils.Test(out var output, "HelloWorld.ysl");
         output.Should().Be("HELLO WORLD");
     }
 
     [Fact]
     public void Test_Trigger()
     {
-        var vm = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
+        var vm = Utils.Test(out var output, "Trigger1.ysl", "Trigger2.ysl");
         output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2, MY NUMBER IS 120\nMY RESPONSE IS: GOODBYE\nFOLLOWUP: WHY?\nTrue");
     }
 
     [Fact]
     public void Test_Concat()
     {
-        var vm = Utils.Test(out var output, "Concat.ops");
+        var vm = Utils.Test(out var output, "Concat.ysl");
         output.Should().Be("My gold is: 30\nI will pay 8\nMy gold is: 22");
     }
 
     [Fact]
     public void Test_Math()
     {
-        var vm = Utils.Test(out var output, "Math.ops");
+        var vm = Utils.Test(out var output, "Math.ysl");
         output.Should().Be("15\n12\n48\n9");
     }
 
     [Fact]
     public void Test_Params()
     {
-        var vm = Utils.Test(out var output, "Params.ops", "Params2.ops", "Params3.ops");
+        var vm = Utils.Test(out var output, "Params.ysl", "Params2.ysl", "Params3.ysl");
         output.Should().Be("CALLED PARAMS 3\nTHE SUM IS: 12");
     }
 
     [Fact]
     public void Test_ExecOrder()
     {
-        var vm = Utils.Test(out var output, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
+        var vm = Utils.Test(out var output, "ExecutionOrder.ysl", "HelloWorld.ysl", "Math.ysl");
         var tickCount = vm.CurrentTick;
         tickCount.Should().Be(1);
     }
@@ -91,14 +91,14 @@ public partial class EngineTests
     [Fact]
     public void Test_Lists()
     {
-        var vm = Utils.Test(out var output, "Lists.ops");
+        var vm = Utils.Test(out var output, "Lists.ysl");
         output.Should().Be("apple\nbanana\ncherry\n5\n10\n25\nSUM: 40");
     }
 
     [Fact]
     public void Test_DefaultArg()
     {
-        var vm = Utils.Test(out var output, "DefaultArg.ops");
+        var vm = Utils.Test(out var output, "DefaultArg.ysl");
         output.Should().Be("<empty>\n*\n5\n9");
     }
 
@@ -106,7 +106,7 @@ public partial class EngineTests
     public void Test_TriggerSequence()
     {
         var vm = new VirtualMachine();
-        vm.CompileFile("scripts/Sequence.ops");
+        vm.CompileFile("scripts/Sequence.ysl");
         vm.Initialize();
 
         var output = "";
@@ -133,7 +133,7 @@ public partial class EngineTests
     public void Test_TriggerSequence_TickContract()
     {
         var vm = new VirtualMachine();
-        vm.CompileFile("scripts/Sequence.ops");
+        vm.CompileFile("scripts/Sequence.ysl");
         vm.Initialize();
 
         var output = "";

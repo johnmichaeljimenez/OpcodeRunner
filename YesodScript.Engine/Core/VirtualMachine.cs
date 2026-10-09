@@ -336,7 +336,7 @@ public class VirtualMachine : IDisposable
 		}
 	}
 
-	public void CompileDirectory(string path, string ext = "ops")
+	public void CompileDirectory(string path, string ext = "ysl")
 	{
 		foreach (var file in Directory.GetFiles(path, $"*.{ext}", SearchOption.AllDirectories))
 		{

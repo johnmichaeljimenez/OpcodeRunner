@@ -7,21 +7,21 @@ public partial class EngineTests
     [Fact]
     public void Test_Minsky()
     {
-        var vm = Utils.Test(out var output, "special/Minsky.ops");
+        var vm = Utils.Test(out var output, "special/Minsky.ysl");
         output.Should().Contain("ENDED:\n12");
     }
 
     [Fact]
     public void Test_Countdown()
     {
-        var vm = Utils.Test(out var output, "special/Countdown.ops");
+        var vm = Utils.Test(out var output, "special/Countdown.ysl");
         output.Should().Be("INITIALIZED PROGRAM\nBEGIN COUNTDOWN\n10\n9\n8\n7\n6\n5\n4\n3\n2\n1\nDONE!");
     }
 
     [Fact]
     public void Test_EnemyAI()
     {
-        var vm = Utils.Test(out var output, "special/EnemyGame.ops", "special/EnemyAI.ops");
+        var vm = Utils.Test(out var output, "special/EnemyGame.ysl", "special/EnemyAI.ysl");
 
         output.Should().Be(
             "GAME START\n" +
