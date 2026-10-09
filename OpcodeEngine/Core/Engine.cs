@@ -311,6 +311,11 @@ public class Engine : IDisposable
 		}
 	}
 
+	public Instruction FindInstruction(string id)
+	{
+		return allCommands.FirstOrDefault(p => p.ID.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+	}
+
 	public IEnumerable<Instruction> FindInstructions(Func<Instruction, string> selector, string query)
 	{
 		if (selector == null)
@@ -331,13 +336,29 @@ public class Engine : IDisposable
 		}
 	}
 
-	public Instruction CompileFile(string path, string id = null, string workingDir = "Scripts")
+	public void CompileDirectory(string path, string ext = "ops")
+	{
+		foreach (var file in Directory.GetFiles(path, $"*.{ext}", SearchOption.AllDirectories))
+		{
+			CompileFile(file);
+		}
+	}
+
+	public Instruction CompileFile(string path, string id = null)
 	{
 		if (string.IsNullOrEmpty(id))
 		{
-			string relative = Path.GetRelativePath(workingDir, path);
-			id = Path.Combine(Path.GetDirectoryName(relative), Path.GetFileNameWithoutExtension(relative))
-					 .Replace('\\', '/');
+			var segments = path.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+
+			if (segments.Length > 1)
+			{
+				segments[^1] = Path.GetFileNameWithoutExtension(segments[^1]);
+				id = string.Join("/", segments.Skip(1));
+			}
+			else
+			{
+				id = Path.GetFileNameWithoutExtension(path);
+			}
 		}
 
 		var content = File.ReadAllText(path);
