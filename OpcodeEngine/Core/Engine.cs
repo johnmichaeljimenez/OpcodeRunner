@@ -331,10 +331,17 @@ public class Engine : IDisposable
 		}
 	}
 
-	public Instruction CompileFile(string path, string id = null) //null id == file path
+	public Instruction CompileFile(string path, string id = null, string workingDir = "Scripts")
 	{
+		if (string.IsNullOrEmpty(id))
+		{
+			string relative = Path.GetRelativePath(workingDir, path);
+			id = Path.Combine(Path.GetDirectoryName(relative), Path.GetFileNameWithoutExtension(relative))
+					 .Replace('\\', '/');
+		}
+
 		var content = File.ReadAllText(path);
-		return Compile(string.IsNullOrEmpty(id) ? Path.GetFileNameWithoutExtension(path) : id, content);
+		return Compile(id, content);
 	}
 
 	public Instruction Compile(string id, string code)
