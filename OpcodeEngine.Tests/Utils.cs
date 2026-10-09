@@ -6,11 +6,6 @@ public static class Utils
 {
 	internal static Engine Test(out string output, params string[] scriptFileNames)
 	{
-		return Test(out output, true, scriptFileNames);
-	}
-	
-	internal static Engine Test(out string output, bool immediateMode, params string[] scriptFileNames)
-	{
 		var engineOutput = "";
 		var engine = new Engine();
 		foreach (var i in scriptFileNames)

@@ -73,7 +73,7 @@ public partial class EngineTests
     [Fact]
     public void Test_ExecOrder()
     {
-        var engine = Utils.Test(out var output, true, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
+        var engine = Utils.Test(out var output, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
         var tickCount = engine.CurrentTick;
         tickCount.Should().Be(1);
     }
@@ -81,7 +81,7 @@ public partial class EngineTests
     [Fact]
     public void Test_RNG()
     {
-        var engine = Utils.Test(out var output, true);
+        var engine = Utils.Test(out var output);
         engine.RNG.Should().NotBeNull();
 
         engine.RandomSeed = 12;
