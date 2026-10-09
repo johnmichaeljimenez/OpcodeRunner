@@ -19,6 +19,14 @@ public partial class EngineTests
 
         engineOutput.Should().ContainAll(commands);
     }
+    [Fact]
+    public void Test_Directory()
+    {
+        var engine = new Engine();
+        engine.CompileDirectory("scripts", "ops");
+        engine.FindInstruction("DefaultArg").Should().NotBeNull();
+        engine.FindInstruction("special/Minsky").Should().NotBeNull();
+    }
 
     [Fact]
     public void Test_Regex()
