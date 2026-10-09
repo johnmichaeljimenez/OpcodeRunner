@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpcodeEngine.Commands;
+using YesodScript.Engine.Commands;
 
-namespace OpcodeEngine.Core;
+namespace YesodScript.Engine.Core;
 
 public class CommandType
 {
@@ -22,7 +22,7 @@ public class CommandParameter
 [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public sealed class CommandParameterAttribute : Attribute { }
 
-public class Engine : IDisposable
+public class VirtualMachine : IDisposable
 {
 	public long CurrentTick { get; private set; }
 	public readonly List<Var> Vars = new();
@@ -56,7 +56,7 @@ public class Engine : IDisposable
 
 	public Action<string> OnOutput;
 
-	public Engine(int randomSeed = 0)
+	public VirtualMachine(int randomSeed = 0)
 	{
 		RandomSeed = randomSeed;
 		InitRegistry();

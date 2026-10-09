@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands;
+namespace YesodScript.Engine.Commands;
 
 public class _Trigger : Command
 {
@@ -18,13 +18,13 @@ public class _Trigger : Command
 
 public class TriggerSequence
 {
-	private readonly Engine engine;
+	private readonly VirtualMachine vm;
 	private readonly Queue<string> queue = new();
 	private List<Instruction> active = new();
 
-	public TriggerSequence(Engine engine)
+	public TriggerSequence(VirtualMachine vm)
 	{
-		this.engine = engine;
+		this.vm = vm;
 	}
 
 	public void Enqueue(string trigger)
@@ -44,7 +44,7 @@ public class TriggerSequence
 			if (queue.Count == 0)
 				return true;
 
-			active = engine.FireTrigger(queue.Dequeue());
+			active = vm.FireTrigger(queue.Dequeue());
 		}
 	}
 }

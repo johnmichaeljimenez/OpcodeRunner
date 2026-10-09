@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace OpcodeEngine.Core;
+namespace YesodScript.Engine.Core;
 
 public class Var
 {

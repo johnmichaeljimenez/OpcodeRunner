@@ -1,27 +1,27 @@
 using FluentAssertions;
 
-namespace OpcodeEngine.Tests;
+namespace YesodScript.Engine.Tests;
 
 public partial class EngineTests
 {
     [Fact]
     public void Test_Minsky()
     {
-        var engine = Utils.Test(out var output, "special/Minsky.ops");
+        var vm = Utils.Test(out var output, "special/Minsky.ops");
         output.Should().Contain("ENDED:\n12");
     }
 
     [Fact]
     public void Test_Countdown()
     {
-        var engine = Utils.Test(out var output, "special/Countdown.ops");
+        var vm = Utils.Test(out var output, "special/Countdown.ops");
         output.Should().Be("INITIALIZED PROGRAM\nBEGIN COUNTDOWN\n10\n9\n8\n7\n6\n5\n4\n3\n2\n1\nDONE!");
     }
 
     [Fact]
     public void Test_EnemyAI()
     {
-        var engine = Utils.Test(out var output, "special/EnemyGame.ops", "special/EnemyAI.ops");
+        var vm = Utils.Test(out var output, "special/EnemyGame.ops", "special/EnemyAI.ops");
 
         output.Should().Be(
             "GAME START\n" +

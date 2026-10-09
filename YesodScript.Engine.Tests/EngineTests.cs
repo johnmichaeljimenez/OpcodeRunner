@@ -1,8 +1,8 @@
 using FluentAssertions;
-using OpcodeEngine.Commands;
-using OpcodeEngine.Core;
+using YesodScript.Engine.Commands;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Tests;
+namespace YesodScript.Engine.Tests;
 
 public partial class EngineTests
 {
@@ -10,22 +10,22 @@ public partial class EngineTests
     public void Test_Dump()
     {
         var commands = new string[] { "WAIT", "MUL", "JUMPIF" };
-        var engineOutput = "";
-        var engine = new Engine();
+        var vmOutput = "";
+        var vm = new VirtualMachine();
 
-        engine.OnOutput += (str) => { engineOutput += $"{str}"; };
-        engine.DumpCommands(commands);
-        Console.WriteLine(engineOutput);
+        vm.OnOutput += (str) => { vmOutput += $"{str}"; };
+        vm.DumpCommands(commands);
+        Console.WriteLine(vmOutput);
 
-        engineOutput.Should().ContainAll(commands);
+        vmOutput.Should().ContainAll(commands);
     }
     [Fact]
     public void Test_Directory()
     {
-        var engine = new Engine();
-        engine.CompileDirectory("scripts", "ops");
-        engine.FindInstruction("DefaultArg").Should().NotBeNull();
-        engine.FindInstruction("special/Minsky").Should().NotBeNull();
+        var vm = new VirtualMachine();
+        vm.CompileDirectory("scripts", "ops");
+        vm.FindInstruction("DefaultArg").Should().NotBeNull();
+        vm.FindInstruction("special/Minsky").Should().NotBeNull();
     }
 
     [Fact]
@@ -38,81 +38,81 @@ public partial class EngineTests
     [Fact]
     public void Test_HelloWorld()
     {
-        var engine = Utils.Test(out var output, "HelloWorld.ops");
+        var vm = Utils.Test(out var output, "HelloWorld.ops");
         output.Should().Be("HELLO WORLD");
     }
 
     [Fact]
     public void Test_Trigger()
     {
-        var engine = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
+        var vm = Utils.Test(out var output, "Trigger1.ops", "Trigger2.ops");
         output.Should().Be("TRIGGER TEST\nHELLO I AM FROM TRIGGER2, MY NUMBER IS 120\nMY RESPONSE IS: GOODBYE\nFOLLOWUP: WHY?\nTrue");
     }
 
     [Fact]
     public void Test_Concat()
     {
-        var engine = Utils.Test(out var output, "Concat.ops");
+        var vm = Utils.Test(out var output, "Concat.ops");
         output.Should().Be("My gold is: 30\nI will pay 8\nMy gold is: 22");
     }
 
     [Fact]
     public void Test_Math()
     {
-        var engine = Utils.Test(out var output, "Math.ops");
+        var vm = Utils.Test(out var output, "Math.ops");
         output.Should().Be("15\n12\n48\n9");
     }
 
     [Fact]
     public void Test_Params()
     {
-        var engine = Utils.Test(out var output, "Params.ops", "Params2.ops", "Params3.ops");
+        var vm = Utils.Test(out var output, "Params.ops", "Params2.ops", "Params3.ops");
         output.Should().Be("CALLED PARAMS 3\nTHE SUM IS: 12");
     }
 
     [Fact]
     public void Test_ExecOrder()
     {
-        var engine = Utils.Test(out var output, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
-        var tickCount = engine.CurrentTick;
+        var vm = Utils.Test(out var output, "ExecutionOrder.ops", "HelloWorld.ops", "Math.ops");
+        var tickCount = vm.CurrentTick;
         tickCount.Should().Be(1);
     }
 
     [Fact]
     public void Test_RNG()
     {
-        var engine = Utils.Test(out var output);
-        engine.RNG.Should().NotBeNull();
+        var vm = Utils.Test(out var output);
+        vm.RNG.Should().NotBeNull();
 
-        engine.RandomSeed = 12;
-        engine.RandomSeed.Should().Be(12);
+        vm.RandomSeed = 12;
+        vm.RandomSeed.Should().Be(12);
     }
 
     [Fact]
     public void Test_Lists()
     {
-        var engine = Utils.Test(out var output, "Lists.ops");
+        var vm = Utils.Test(out var output, "Lists.ops");
         output.Should().Be("apple\nbanana\ncherry\n5\n10\n25\nSUM: 40");
     }
 
     [Fact]
     public void Test_DefaultArg()
     {
-        var engine = Utils.Test(out var output, "DefaultArg.ops");
+        var vm = Utils.Test(out var output, "DefaultArg.ops");
         output.Should().Be("<empty>\n*\n5\n9");
     }
 
     [Fact]
     public void Test_TriggerSequence()
     {
-        var engine = new Engine();
-        engine.CompileFile("scripts/Sequence.ops");
-        engine.Initialize();
+        var vm = new VirtualMachine();
+        vm.CompileFile("scripts/Sequence.ops");
+        vm.Initialize();
 
         var output = "";
-        engine.OnOutput += str => output += $"{str}";
+        vm.OnOutput += str => output += $"{str}";
 
-        var seq = new TriggerSequence(engine);
+        var seq = new TriggerSequence(vm);
         seq.Enqueue("SECOND");
         seq.Enqueue("FIRST");
         seq.Enqueue("   ");//should be ignored
@@ -121,8 +121,8 @@ public partial class EngineTests
         while (true)
         {
             seq.Tick();
-            engine.Tick(0.033333f);
-            if (seq.Tick() && !engine.IsRunning)
+            vm.Tick(0.033333f);
+            if (seq.Tick() && !vm.IsRunning)
                 break;
         }
 
@@ -132,21 +132,21 @@ public partial class EngineTests
     [Fact]
     public void Test_TriggerSequence_TickContract()
     {
-        var engine = new Engine();
-        engine.CompileFile("scripts/Sequence.ops");
-        engine.Initialize();
+        var vm = new VirtualMachine();
+        vm.CompileFile("scripts/Sequence.ops");
+        vm.Initialize();
 
         var output = "";
-        engine.OnOutput += str => output += $"{str}";
+        vm.OnOutput += str => output += $"{str}";
 
-        var seq = new TriggerSequence(engine);
+        var seq = new TriggerSequence(vm);
         seq.Tick().Should().BeTrue();//empty queue -> done immediately
 
         seq.Enqueue("FIRST");
         seq.Tick().Should().BeFalse();//something fired and is running
 
         while (!seq.Tick())
-            engine.Tick(0.033333f);
+            vm.Tick(0.033333f);
 
         output.Should().Contain("A1\nA2");
         seq.Tick().Should().BeTrue();//drained

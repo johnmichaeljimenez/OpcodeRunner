@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands
+namespace YesodScript.Engine.Commands
 {
 	public class Print : Command
 	{
@@ -9,7 +9,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			Engine.OnOutput?.Invoke($"{msg}\n");
+			VM.OnOutput?.Invoke($"{msg}\n");
 		}
 	}
 }

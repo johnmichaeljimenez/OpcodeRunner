@@ -1,11 +1,11 @@
 using System.Globalization;
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands
+namespace YesodScript.Engine.Commands
 {
 	public abstract class Command
 	{
-		protected Engine Engine { get; private set; }
+		protected VirtualMachine VM { get; private set; }
 		protected Instruction Instruction { get; private set; }
 
 		private CommandType _commandType;
@@ -13,9 +13,9 @@ namespace OpcodeEngine.Commands
 		
 		private Dictionary<int, string> _deferredArgs;
 
-		internal void Initialize(Engine engine, Instruction instruction, CommandType commandType, ArgumentToken[] args)
+		internal void Initialize(VirtualMachine vm, Instruction instruction, CommandType commandType, ArgumentToken[] args)
 		{
-			Engine = engine;
+			VM = vm;
 			Instruction = instruction;
 			_commandType = commandType;
 			_rawArgs = args;
@@ -62,11 +62,11 @@ namespace OpcodeEngine.Commands
 				if (!isRef && !isDeferred) continue;
 
 				var param = _commandType.Parameters[i];
-				string resolved = Engine.ResolveReferences(raw, Instruction);
+				string resolved = VM.ResolveReferences(raw, Instruction);
 
 				if (resolved == raw && isDeferred)
 				{
-					var nakedVar = Engine.GetVar(raw, Instruction);
+					var nakedVar = VM.GetVar(raw, Instruction);
 					if (nakedVar != null && nakedVar.Value != null)
 					{
 						resolved = Convert.ToString(nakedVar.Value, CultureInfo.InvariantCulture);

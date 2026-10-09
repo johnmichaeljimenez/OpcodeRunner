@@ -4,11 +4,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
-    <PackageId>OpcodeRunner.Engine</PackageId>
+    <PackageId>YesodScript.Engine</PackageId>
 
     <Authors>John Jimenez</Authors>
     <Description>Lightweight interpreted Domain Specific Language (DSL) engine for games.</Description>
-    <RepositoryUrl>https://github.com/johnmichaeljimenez/OpcodeRunner</RepositoryUrl>
+    <RepositoryUrl>https://github.com/johnmichaeljimenez/YesodScript</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     
     <MinVerTagPrefix>v</MinVerTagPrefix>

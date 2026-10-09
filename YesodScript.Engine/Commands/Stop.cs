@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands
+namespace YesodScript.Engine.Commands
 {
     public class Stop : Command
     {
@@ -9,7 +9,7 @@ namespace OpcodeEngine.Commands
 
         public override void OnEnter()
         {
-            Engine.Stop(scriptId);
+            VM.Stop(scriptId);
         }
     }
 }

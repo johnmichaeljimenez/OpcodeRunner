@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands;
+namespace YesodScript.Engine.Commands;
 
 public class RNG : Command
 {
@@ -11,7 +11,7 @@ public class RNG : Command
 
 	public override void OnEnter()
 	{
-		var value = Engine.RNG.NextSingle();
+		var value = VM.RNG.NextSingle();
 		if (value <= range)
 			Instruction.Jump(labelName);
 	}
@@ -28,7 +28,7 @@ public class RNGRange : Command
 
 	public override void OnEnter()
 	{
-		var value = Engine.RNG.NextSingle();
+		var value = VM.RNG.NextSingle();
 		if (value >= min && value <= max)
 			Instruction.Jump(labelName);
 	}

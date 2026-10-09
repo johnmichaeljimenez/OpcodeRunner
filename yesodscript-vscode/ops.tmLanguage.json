@@ -1,7 +1,7 @@
 {
-  "name": "OpcodeRunner",
-  "scopeName": "source.ops",
-  "fileTypes": ["ops"],
+  "name": "YesodScript.Engine",
+  "scopeName": "source.ysl",
+  "fileTypes": ["ysl"],
   "patterns": [
     { "include": "#comment" },
     { "include": "#trigger" },
@@ -17,25 +17,25 @@
   ],
   "repository": {
     "comment": {
-      "name": "comment.line.number-sign.ops",
+      "name": "comment.line.number-sign.ysl",
       "match": "#.*$"
     },
     "trigger": {
       "match": "^\\s*(@)(\\S+)",
       "captures": {
-        "1": { "name": "punctuation.definition.trigger.ops" },
-        "2": { "name": "entity.name.function.trigger.ops" }
+        "1": { "name": "punctuation.definition.trigger.ysl" },
+        "2": { "name": "entity.name.function.trigger.ysl" }
       }
     },
     "label": {
       "match": "^\\s*(>)\\s*(\\S+)",
       "captures": {
-        "1": { "name": "keyword.control.label.ops" },
-        "2": { "name": "entity.name.label.ops" }
+        "1": { "name": "keyword.control.label.ysl" },
+        "2": { "name": "entity.name.label.ysl" }
       }
     },
     "string": {
-      "name": "string.quoted.double.ops",
+      "name": "string.quoted.double.ysl",
       "begin": "\"",
       "end": "\"",
       "patterns": [
@@ -44,37 +44,37 @@
       ]
     },
     "interpolation": {
-      "name": "variable.other.interpolated.ops",
+      "name": "variable.other.interpolated.ysl",
       "begin": "\\[\\[",
       "end": "\\]\\]"
     },
     "parameter": {
-      "name": "variable.parameter.ops",
+      "name": "variable.parameter.ysl",
       "match": "<[^<>]+>"
     },
     "defaultArg": {
       "match": "(^|[\\t ])(\\*)(?=[\\t ]|$)",
       "captures": {
-        "2": { "name": "constant.language.default.ops" }
+        "2": { "name": "constant.language.default.ysl" }
       }
     },
     "command": {
       "match": "^\\s*(?![@#>])([A-Za-z_][A-Za-z0-9_]*)\\b",
       "captures": {
-        "1": { "name": "keyword.control.command.ops" }
+        "1": { "name": "keyword.control.command.ysl" }
       }
     },
     "type": {
-      "name": "storage.type.ops",
+      "name": "storage.type.ysl",
       "match": "(?i)(?<=\\s)\\b(int|float|string|bool)\\b"
     },
     "boolean": {
-      "name": "constant.language.boolean.ops",
+      "name": "constant.language.boolean.ysl",
       "match": "(?i)\\b(true|false)\\b"
     },
     "number": {
       "match": "\\b-?\\d+(?:\\.\\d+)?\\b",
-      "name": "constant.numeric.ops"
+      "name": "constant.numeric.ysl"
     }
   }
 }

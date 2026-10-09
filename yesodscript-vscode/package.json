@@ -1,0 +1,24 @@
+{
+  "name": "yesodscript",
+  "displayName": "YesodScript",
+  "description": "YesodScript .ysl syntax",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.74.0" },
+  "contributes": {
+    "languages": [
+      {
+        "id": "ysl",
+        "aliases": ["YesodScript"],
+        "extensions": [".ysl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ysl",
+        "scopeName": "source.ysl",
+        "path": "./ysl.tmLanguage.json"
+      }
+    ]
+  }
+}

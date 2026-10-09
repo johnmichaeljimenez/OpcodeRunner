@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="YesodScript.Engine.Tests/YesodScript.Engine.Tests.csproj" />
+  <Project Path="YesodScript.Engine/YesodScript.Engine.csproj" />
+</Solution>

@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands
+namespace YesodScript.Engine.Commands
 {
 	public class Call : Command
 	{
@@ -11,7 +11,7 @@ namespace OpcodeEngine.Commands
 
 		public override void OnEnter()
 		{
-			_fired = Engine.FireTrigger(id);
+			_fired = VM.FireTrigger(id);
 		}
 
 		public override bool OnTick(float deltaTime)

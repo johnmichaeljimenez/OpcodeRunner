@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpcodeEngine\OpcodeEngine.csproj" />
+    <ProjectReference Include="..\YesodScript.Engine\YesodScript.Engine.csproj" />
     <None Include="scripts/**/*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

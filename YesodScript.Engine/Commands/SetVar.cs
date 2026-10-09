@@ -1,6 +1,6 @@
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands;
+namespace YesodScript.Engine.Commands;
 
 public class SetVar : Command
 {
@@ -16,7 +16,7 @@ public class SetVar : Command
 	public override void OnEnter()
 	{
 		base.OnEnter();
-		var v = Engine.GetVar(key, Instruction)
+		var v = VM.GetVar(key, Instruction)
 			?? throw new InvalidOperationException($"Var '{key}' not found.");
 		v.SetValue(value, relative);
 	}
@@ -38,7 +38,7 @@ public class DefVar : Command
 		base.OnEnter();
 
 		var isLocal = key != null && key.StartsWith("_", StringComparison.Ordinal);
-		var vars = isLocal ? Instruction.Vars : Engine.Vars;
+		var vars = isLocal ? Instruction.Vars : VM.Vars;
 
 		if (vars.Any(v => string.Equals(v.Name, key, StringComparison.OrdinalIgnoreCase)))
 			throw new Exception($"Var '{key}' already exists.");

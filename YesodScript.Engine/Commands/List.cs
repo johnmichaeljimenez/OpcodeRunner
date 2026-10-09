@@ -1,11 +1,11 @@
 using System.Globalization;
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands;
+namespace YesodScript.Engine.Commands;
 
 public static class ListAccess
 {
-	public static void Set(Engine e, string key, Instruction scope, params object[] values)
+	public static void Set(VirtualMachine e, string key, Instruction scope, params object[] values)
 	{
 		var list = Get(e, key, scope);
 		if (list == null)
@@ -15,7 +15,7 @@ public static class ListAccess
 		list.Items.AddRange(values);
 	}
 
-	public static OpList Get(Engine e, string key, Instruction scope) =>
+	public static OpList Get(VirtualMachine e, string key, Instruction scope) =>
 		e.GetVar(key, scope)?.Value as OpList
 			?? throw new InvalidOperationException($"'{key}' is not a list.");
 
@@ -41,7 +41,7 @@ public class DefList : Command
 	public override void OnEnter()
 	{
 		bool isLocal = key != null && key.StartsWith("_", StringComparison.Ordinal);
-		var vars = isLocal ? Instruction.Vars : Engine.Vars;
+		var vars = isLocal ? Instruction.Vars : VM.Vars;
 
 		if (vars.Any(v => string.Equals(v.Name, key, StringComparison.OrdinalIgnoreCase)))
 			throw new Exception($"Var '{key}' already exists.");
@@ -66,7 +66,7 @@ public class ListAdd : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
+		var l = ListAccess.Get(VM, key, Instruction);
 		l.Items.Add(ListAccess.Parse(l, value, nameof(value)));
 	}
 }
@@ -79,7 +79,7 @@ public class ListSet : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
+		var l = ListAccess.Get(VM, key, Instruction);
 		l.Items[ListAccess.Index(l, index)] = ListAccess.Parse(l, value, nameof(value));
 	}
 }
@@ -92,7 +92,7 @@ public class ListInsert : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
+		var l = ListAccess.Get(VM, key, Instruction);
 		l.Items.Insert(ListAccess.Index(l, index, allowEnd: true),
 					   ListAccess.Parse(l, value, nameof(value)));
 	}
@@ -105,7 +105,7 @@ public class ListRemove : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
+		var l = ListAccess.Get(VM, key, Instruction);
 		l.Items.RemoveAt(ListAccess.Index(l, index));
 	}
 }
@@ -113,7 +113,7 @@ public class ListRemove : Command
 public class ListClear : Command
 {
 	[CommandParameter] private string key;
-	public override void OnEnter() => ListAccess.Get(Engine, key, Instruction).Items.Clear();
+	public override void OnEnter() => ListAccess.Get(VM, key, Instruction).Items.Clear();
 }
 
 public class ListGet : Command
@@ -124,8 +124,8 @@ public class ListGet : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
-		var v = Engine.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
+		var l = ListAccess.Get(VM, key, Instruction);
+		var v = VM.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
 
 		// store as the natural element type so [[outVar]] and math work normally
 		v.Value = l.ElementType == typeof(string)
@@ -143,8 +143,8 @@ public class ListCount : Command
 
 	public override void OnEnter()
 	{
-		var l = ListAccess.Get(Engine, key, Instruction);
-		var v = Engine.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
+		var l = ListAccess.Get(VM, key, Instruction);
+		var v = VM.GetVar(outVar, Instruction) ?? throw new InvalidOperationException($"Var '{outVar}' not found.");
 		v.SetValue(l.Items.Count.ToString(CultureInfo.InvariantCulture), false);
 	}
 }

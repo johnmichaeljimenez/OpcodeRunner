@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using OpcodeEngine.Commands;
+using YesodScript.Engine.Commands;
 
-namespace OpcodeEngine.Core
+namespace YesodScript.Engine.Core
 {
 	public class TriggerDefinition
 	{

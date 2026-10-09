@@ -1,7 +1,7 @@
 using System.Globalization;
-using OpcodeEngine.Core;
+using YesodScript.Engine.Core;
 
-namespace OpcodeEngine.Commands
+namespace YesodScript.Engine.Commands
 {
 	public abstract class VarMath : Command
 	{
@@ -17,7 +17,7 @@ namespace OpcodeEngine.Commands
 		{
 			base.OnEnter();
 
-			var var = Engine.GetVar(key, Instruction);
+			var var = VM.GetVar(key, Instruction);
 
 			if (var == null)
 				throw new InvalidOperationException($"Var '{key}' was not found.");
