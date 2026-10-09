@@ -1,0 +1,1 @@
+dotnet test --configuration Release --no-restore --verbosity normal
