@@ -1,5 +1,4 @@
 <Solution>
   <Project Path="OpcodeEngine.Tests/OpcodeEngine.Tests.csproj" />
   <Project Path="OpcodeEngine/OpcodeEngine.csproj" />
-  <Project Path="OpcodeTest/OpcodeTest.csproj" />
 </Solution>
